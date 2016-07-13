@@ -1,0 +1,25 @@
+<nav class="navbar navbar-light">
+  <ul class="nav navbar-nav">
+    <li class="nav-item"><a href="#">TODO</a></li>
+    <li class="nav-item"><a href="#">TODO</a></li>
+    <li class="nav-item"><a href="#">TODO</a></li>
+  </ul>
+</nav>
+
+<div class="container">
+  <div class="row">
+    <div class="col-xs-8 col-xs-offset-2">
+      <form>
+        <fieldset class="form-group">
+          <label for="phone-number">Your cellphone number</label>
+          <input type="tel" id="phone-number" class="form-control">
+        </fieldset>
+        <fieldset class="form-group">
+          <label for="nickname">Your nickname</label>
+          <input type="text" id="nickname" class="form-control">
+        </fieldset>
+        <button type="submit" class="btn btn-primary">Jump</button>
+      </form>
+    </div>
+  </div>
+</div>

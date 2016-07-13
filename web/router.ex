@@ -17,6 +17,7 @@ defmodule OmniChat.Router do
     pipe_through :browser
 
     get "/", HomeController, :index
+    resources "/sessions", SessionController, only: [:new, :create]
   end
 
   # Other scopes may use custom stacks.
