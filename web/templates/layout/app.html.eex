@@ -15,6 +15,11 @@
     <%= render @view_module, @view_template, assigns %>
 
     <script src="<%= static_path(@conn, "/js/vendor.js") %>"></script>
+    <script src="<%= static_path(@conn, "/js/polyfiller.js") %>"></script>
+    <script type="text/javascript">
+      webshim.setOptions({extendNative: true, debug: true})
+      webshim.polyfill('forms forms-ext')
+    </script>
     <script src="<%= static_path(@conn, "/js/app.js") %>"></script>
   </body>
 </html>
