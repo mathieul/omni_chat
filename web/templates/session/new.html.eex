@@ -16,20 +16,24 @@
 
 <div class="container with-fixed-top-navbar">
   <div class="row">
-    <div class="col-xs-8 col-xs-offset-2">
-      <%= form_for @conn, session_path(@conn, :create), [as: :session], fn f -> %>
-        <fieldset class="form-group">
-          <%= label f, :phone_number, "Your cellphone number" %>
-          <%= telephone_input f,  :phone_number, class: "form-control", required: true %>
-        </fieldset>
-        <fieldset class="form-group">
-          <%= label f, :nickname, "Your nickname" %>
-          <%= text_input f, :nickname, class: "form-control", required: true %>
-        </fieldset>
-        <%= submit "Jump", class: "btn btn-primary" %>
-        or
-        <%= link "Cancel", to: home_path(@conn, :index), class: "btn btn-default", required: true %>
-      <% end %>
+    <div class="col-xs-10 col-xs-offset-1 col-md-6 col-md-offset-3">
+      <div class="card">
+        <div class="card-block">
+          <h4 class="card-title">Authenticate</h4>
+          <%= form_for @conn, session_path(@conn, :create), [as: :session], fn f -> %>
+            <fieldset class="form-group">
+              <%= telephone_input f,  :phone_number,
+                                      class: "form-control",
+                                      placeholder: "Cell phone number",
+                                      required: true %>
+            </fieldset>
+            <div class="actions text-xs-right">
+              <%= link "Cancel", to: home_path(@conn, :index), class: "btn btn-secondary", required: true %>
+              <%= submit "Get Code", class: "btn btn-primary" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
     </div>
   </div>
 </div>
