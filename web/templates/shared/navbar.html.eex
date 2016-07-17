@@ -1,0 +1,19 @@
+<header class="navbar navbar-fixed-top navbar-dark bg-primary">
+  <div class="clearfix">
+    <button class="navbar-toggler pull-xs-right hidden-sm-up"
+            type="button"
+            data-toggle="collapse"
+            data-target="#responsive-navbar">&#9776;</button>
+  </div>
+  <div id="responsive-navbar" class="navbar-toggleable-xs collapse">
+    <nav class="nav navbar-nav">
+      <a class="nav-item nav-link" href="#">TODO1</a>
+      <a class="nav-item nav-link" href="#">TODO2</a>
+      <a class="nav-item nav-link" href="#">TODO3</a>
+    </nav>
+  </div>
+</header>
+
+<div class="with-fixed-top-navbar">
+  Content here
+</div>

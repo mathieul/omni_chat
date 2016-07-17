@@ -18,7 +18,7 @@ defmodule OmniChat.Router do
 
     get "/", HomeController, :index
     resources "/session", SessionController, only: [:new, :create], singleton: true
-    get "/session/confirm", SessionController, :confirm
+    get "/session/confirm/:chatter_id", SessionController, :confirm
   end
 
   # Other scopes may use custom stacks.
