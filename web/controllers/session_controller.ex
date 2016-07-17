@@ -6,6 +6,9 @@ defmodule OmniChat.SessionController do
   end
 
   def create(conn, %{"session" => %{"phone_number" => phone_number}}) do
-    text conn, "phone number = #{phone_number}"
+    text conn, "phone number = #{normalize_phone_number phone_number}"
   end
+
+  defp normalize_phone_number(number),
+    do: Regex.replace(~r/\D+/, number, "")
 end

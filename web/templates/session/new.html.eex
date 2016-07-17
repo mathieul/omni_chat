@@ -20,12 +20,19 @@
       <div class="card">
         <div class="card-block">
           <h4 class="card-title">Authenticate</h4>
-          <%= form_for @conn, session_path(@conn, :create), [as: :session], fn f -> %>
-            <fieldset class="form-group">
-              <%= telephone_input f,  :phone_number,
-                                      class: "form-control",
-                                      placeholder: "Cell phone number",
-                                      required: true %>
+          <%= form_for @conn, session_path(@conn, :create), [as: :session, data: [toggle: "validator"]], fn f -> %>
+            <fieldset class="form-group has-feedback">
+              <%= label f, :phone_number, "Your cell phone number" %>
+              <div class="input-group">
+                <%= telephone_input f,  :phone_number,
+                                        class: "form-control",
+                                        placeholder: "(999) 999-9999",
+                                        pattern: "^\[\( ]*[0-9]{3}[\) -.]*[0-9]{3}[ -.]*[0-9]{4} *$",
+                                        data: [error: "invalid phone number format"],
+                                        autocomplete: "off",
+                                        required: true %>
+              </div>
+              <div class="help-block with-errors"></div>
             </fieldset>
             <div class="actions text-xs-right">
               <%= link "Cancel", to: home_path(@conn, :index), class: "btn btn-secondary", required: true %>
