@@ -16,7 +16,18 @@
                                         autocomplete: "off",
                                         required: true %>
               </div>
-              <div class="help-block with-errors"></div>
+              <div class="help-block with-errors">
+                <% if assigns[:errors] do %>
+                  <ul>
+                    <% Enum.each @errors, fn ({field, error}) -> %>
+                      <li>
+                        <%= field %>:
+                        <%= translate_error error %>
+                      </li>
+                    <% end %>
+                  </ul>
+                <% end %>
+              </div>
             </fieldset>
             <div class="actions text-xs-right">
               <%= link "Cancel", to: home_path(@conn, :index), class: "btn btn-secondary", required: true %>

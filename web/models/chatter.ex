@@ -1,6 +1,8 @@
 defmodule OmniChat.Chatter do
   use OmniChat.Web, :model
 
+  require Logger
+
   schema "chatters" do
     field :phone_number, :string
     field :expire_at, Ecto.DateTime
@@ -16,11 +18,11 @@ defmodule OmniChat.Chatter do
     |> validate_required([:phone_number])
     |> do_normalize_phone_number
     |> validate_length(:phone_number, is: 10, message: "should be %{count} numbers long")
+    |> validate_format(:phone_number, ~r/NOPE/)
     |> generate_authentication_code
   end
 
   defp do_normalize_phone_number(changeset) do
-    # require IEx; IEx.pry
     normalized_number = normalize_phone_number(changeset.changes.phone_number)
     put_change(changeset, :phone_number, normalized_number)
   end
@@ -40,7 +42,7 @@ defmodule OmniChat.Chatter do
   defp generate_authentication_code(changeset) do
     code =
       1..6
-      |> Enum.map(fn _ -> :random.uniform(10) - 1 end)
+      |> Enum.map(fn _ -> :rand.uniform(10) - 1 end)
       |> Enum.join
 
     put_change(changeset, :authentication_code, code)

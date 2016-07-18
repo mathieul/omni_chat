@@ -9,6 +9,7 @@ defmodule OmniChat.SessionController do
 
   def create(conn, %{"session" => %{"phone_number" => phone_number}}) do
     changeset = Chatter.authentication_changeset(%Chatter{}, %{phone_number: phone_number})
+    # require IEx; IEx.pry
 
     if changeset.valid? do
       # destroy any existing Chatter with this phone number
@@ -25,7 +26,9 @@ defmodule OmniChat.SessionController do
       # redirect to authentication code form (code + nickname)
       redirect conn, to: session_path(conn, :confirm, chatter.id)
     else
-      text conn, "TODO: handle validation error"
+      conn
+      |> assign(:errors, changeset.errors)
+      |> render("new.html")
     end
   end
 
