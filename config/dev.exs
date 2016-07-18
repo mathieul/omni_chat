@@ -41,3 +41,6 @@ config :omni_chat, OmniChat.Repo,
   database: "omni_chat_dev",
   hostname: "localhost",
   pool_size: 10
+
+# Enable Twilio integration?
+config :omni_chat, :twilio_enabled, false

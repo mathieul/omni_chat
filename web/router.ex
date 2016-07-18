@@ -9,10 +9,6 @@ defmodule OmniChat.Router do
     plug :put_secure_browser_headers
   end
 
-  pipeline :api do
-    plug :accepts, ["json"]
-  end
-
   scope "/", OmniChat do
     pipe_through :browser
 
@@ -20,9 +16,4 @@ defmodule OmniChat.Router do
     resources "/session", SessionController, only: [:new, :create], singleton: true
     get "/session/confirm/:chatter_id", SessionController, :confirm
   end
-
-  # Other scopes may use custom stacks.
-  # scope "/api", OmniChat do
-  #   pipe_through :api
-  # end
 end

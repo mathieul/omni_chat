@@ -19,6 +19,9 @@ config :omni_chat, OmniChat.Endpoint,
 # Do not print debug messages in production
 config :logger, level: :info
 
+# Enable Twilio integration?
+config :omni_chat, :twilio_enabled, false
+
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key

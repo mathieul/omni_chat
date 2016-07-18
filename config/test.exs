@@ -17,3 +17,6 @@ config :omni_chat, OmniChat.Repo,
   database: "omni_chat_test",
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
+
+  # Enable Twilio integration?
+  config :omni_chat, :twilio_enabled, false
