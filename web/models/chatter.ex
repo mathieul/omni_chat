@@ -12,13 +12,17 @@ defmodule OmniChat.Chatter do
     timestamps()
   end
 
-  def authentication_changeset(struct, params \\ %{}) do
+  def changeset(struct, params \\ %{}) do
+    struct
+    |> cast(params, [:phone_number, :nickname])
+  end
+
+  def authentication_changeset(struct, params) do
     struct
     |> cast(params, [:phone_number, :nickname])
     |> validate_required([:phone_number])
     |> do_normalize_phone_number
     |> validate_length(:phone_number, is: 10, message: "should be %{count} numbers long")
-    |> validate_format(:phone_number, ~r/NOPE/)
     |> generate_authentication_code
   end
 
