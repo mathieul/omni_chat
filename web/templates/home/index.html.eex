@@ -7,7 +7,7 @@
       ut fermentum massa justo sit amet.
     </p>
     <p>
-      <%= link "Start Now", to: session_path(@conn, :new), class: "btn btn-lg btn-success" %>
+      <%= link "Start Now", to: chatter_path(@conn, :new), class: "btn btn-lg btn-success" %>
     </p>
   </div>
 </div>

@@ -4,30 +4,21 @@
       <div class="card">
         <div class="card-block">
           <h4 class="card-title">Authenticate</h4>
-          <%= unless @changeset.valid? do %>
-            <div class="alert alert-danger">
-              <p>Oops, something went wrong, please check errors below.</p>
-            </div>
-          <% end %>
-          <%= form_for @changeset, session_path(@conn, :create), [as: :session, data: [toggle: "validator"]], fn f -> %>
-            <fieldset class="form-group has-feedback <%= unless @changeset.valid?, do: "has-errors" %>">
-              <%= label f, :phone_number, "Your cell phone number" %>
+          <%= form_for @form, chatter_path(@conn, :edit), [method: :get, data: [toggle: "validator"]], fn f -> %>
+            <fieldset class="form-group has-feedback">
+              <%= label f, :authentication_code, "Authentication code received" %>
               <div class="input-group">
-                <%= telephone_input f,  :phone_number,
+                <%= text_input f,  :authentication_code,
                                         class: "form-control",
-                                        placeholder: "(999) 999-9999",
-                                        pattern: "^\[\( ]*[0-9]{3}[\) -.]*[0-9]{3}[ -.]*[0-9]{4} *$",
-                                        data: [error: "invalid phone number format"],
+                                        placeholder: "XXXXXX",
                                         autocomplete: "off",
+                                        autofocus: true,
                                         required: true %>
-              </div>
-              <div class="help-block with-errors">
-                <%= error_tag @changeset, :phone_number %>
               </div>
             </fieldset>
             <div class="actions text-xs-right">
               <%= link "Cancel", to: home_path(@conn, :index), class: "btn btn-secondary", required: true %>
-              <%= submit "Get Code", class: "btn btn-primary" %>
+              <%= submit "Sign In", class: "btn btn-primary" %>
             </div>
           <% end %>
         </div>

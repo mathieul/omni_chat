@@ -1,40 +1,36 @@
+defmodule OmniChat.AuthenticationForm do
+  defstruct authentication_code: nil
+end
+
+defimpl Phoenix.HTML.FormData, for: OmniChat.AuthenticationForm do
+  def to_form(_, _) do
+    %Phoenix.HTML.Form{}
+  end
+
+  def to_form(_, _, _, _) do
+    %Phoenix.HTML.Form{}
+  end
+
+  def input_type(changeset, field) do
+    :text_input
+  end
+
+  def input_validations(changeset, field) do
+    [required: false]
+  end
+end
+
 defmodule OmniChat.SessionController do
   use OmniChat.Web, :controller
 
   alias OmniChat.Chatter
 
   def new(conn, _params) do
-    changeset = Chatter.changeset(%Chatter{})
-    render conn, "new.html", changeset: changeset
-  end
-
-  def create(conn, %{"session" => %{"phone_number" => phone_number}}) do
-    changeset = Chatter.authentication_changeset(%Chatter{}, %{phone_number: phone_number})
-
-    if changeset.valid? do
-      # destroy any existing Chatter with this phone number
-      changeset.changes.phone_number
-      |> Chatter.with_phone_number
-      |> Repo.delete_all
-
-      # save authentication code with expiration as a new Chatter
-      chatter = Repo.insert!(changeset)
-
-      # send SMS with authentication code
-      OmniChat.Messaging.send_message(chatter.phone_number, Chatter.authentication_message(chatter))
-
-      # redirect to authentication code form (code + nickname)
-      redirect conn, to: session_path(conn, :confirm, chatter.id)
-    else
-      render conn, "new.html", changeset: changeset
-    end
-  end
-
-  def confirm(conn, %{"chatter_id" => chatter_id}) do
+    chatter_id = get_session(conn, :chatter_id)
     chatter = Repo.get!(Chatter, chatter_id)
 
     conn
     |> assign(:chatter, chatter)
-    |> render("confirm.html")
+    |> render("new.html", form: %OmniChat.AuthenticationForm{})
   end
 end
