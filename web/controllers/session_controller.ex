@@ -43,6 +43,16 @@ defmodule OmniChat.SessionController do
     chatter_id = get_session(conn, :chatter_id)
     chatter = Repo.get!(Chatter, chatter_id)
 
-    text conn, "SessionController.create (#{authentication_code}) for #{chatter.phone_number}"
+    if chatter.authentication_code == authentication_code do
+      conn
+      |> put_flash(:notice, "Thank you, you've been successfully identified")
+      |> put_session(:authenticated, true)
+      |> redirect(to: home_path(conn, :todo))
+    else
+      conn
+      |> put_flash(:error, "Sorry, I don't recognize this authentication code.")
+      |> put_session(:authenticated, false)
+      |> redirect(to: session_path(conn, :new))
+    end
   end
 end

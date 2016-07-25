@@ -1,0 +1,14 @@
+<div class="container">
+  <%= if get_flash @conn, :notice do %>
+    <div class="row">
+      <div class="col-xs-10 col-xs-offset-1 col-md-6 col-md-offset-3">
+        <div class="alert alert-info">
+          <%= get_flash(@conn, :notice) %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+  <div class="jumbotron text-xs-center">
+    TODO
+  </div>
+</div>
