@@ -30,8 +30,4 @@ defmodule OmniChat.ChatterController do
       render conn, "new.html", changeset: changeset
     end
   end
-
-  def edit(conn, %{"id" => id}) do
-    text conn, "ChatterController.edit: id = #{inspect id}"
-  end
 end

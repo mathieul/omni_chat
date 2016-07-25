@@ -4,7 +4,11 @@
       <div class="card">
         <div class="card-block">
           <h4 class="card-title">Authenticate</h4>
-          <%= form_for @form, chatter_path(@conn, :edit), [method: :get, data: [toggle: "validator"]], fn f -> %>
+          <%= form_for @form, session_path(@conn, :create),
+                      [ method: :get,
+                        as: "session",
+                        data: [toggle: "validator"]
+                      ], fn f -> %>
             <fieldset class="form-group has-feedback">
               <%= label f, :authentication_code, "Authentication code received" %>
               <div class="input-group">
