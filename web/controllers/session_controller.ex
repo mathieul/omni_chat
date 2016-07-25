@@ -3,12 +3,12 @@ defmodule OmniChat.AuthenticationForm do
 end
 
 defimpl Phoenix.HTML.FormData, for: OmniChat.AuthenticationForm do
-  def to_form(auth_form, _opts) do
+  def to_form(auth_form, options) do
     %Phoenix.HTML.Form{
       source: auth_form,
       impl: __MODULE__,
-      id: "auth_form",
-      name: "auth_form"
+      id: options[:as],
+      name: options[:as]
     }
   end
 
@@ -39,7 +39,10 @@ defmodule OmniChat.SessionController do
     |> render("new.html", form: %OmniChat.AuthenticationForm{})
   end
 
-  def create(conn, _params) do
-    text conn, "SessionController.create"
+  def create(conn, %{"session" => %{"authentication_code" => authentication_code}}) do
+    chatter_id = get_session(conn, :chatter_id)
+    chatter = Repo.get!(Chatter, chatter_id)
+
+    text conn, "SessionController.create (#{authentication_code}) for #{chatter.phone_number}"
   end
 end
