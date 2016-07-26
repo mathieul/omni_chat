@@ -9,6 +9,10 @@
     </div>
   <% end %>
   <div class="jumbotron text-xs-center">
-    TODO
+    <ul>
+      <li>phone number = <%= @chatter.phone_number %></li>
+      <li>authentication code = <%= @chatter.authentication_code %></li>
+      <li>expire at = <%= @chatter.expire_at %></li>
+    </ul>
   </div>
 </div>

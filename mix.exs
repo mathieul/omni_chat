@@ -42,7 +42,7 @@ defmodule OmniChat.Mixfile do
   defp deps do
     [
       {:cowboy, "~> 1.0"},
-      {:ex_twilio, "~> 0.1.9"},
+      {:ex_twilio, "~> 0.2.0"},
       {:ex_twiml, "~> 2.1.0"},
       {:gettext, "~> 0.11"},
       {:phoenix_ecto, "~> 3.0"},
