@@ -23,6 +23,7 @@ defmodule OmniChat.Mixfile do
         :cowboy,
         :ex_twilio,
         :ex_twiml,
+        :faker,
         :gettext,
         :logger,
         :phoenix_ecto,
@@ -50,7 +51,8 @@ defmodule OmniChat.Mixfile do
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix, "~> 1.2.0"},
-      {:postgrex, ">= 0.0.0"}
+      {:postgrex, ">= 0.0.0"},
+      {:faker, "~> 0.5"}
     ]
   end
 

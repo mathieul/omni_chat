@@ -9,11 +9,11 @@
     </div>
   <% end %>
   <div class="jumbotron text-xs-center">
-    <ul>
-      <li>phone number = <%= @chatter.phone_number %></li>
-      <li>nickname = <%= @chatter.nickname %></li>
-      <li>authentication code = <%= @chatter.authentication_code %></li>
-      <li>expire at = <%= @chatter.expire_at %></li>
-    </ul>
+    <dl>
+      <dt>phone number</dt><dd><%= @chatter.phone_number %></dd>
+      <dt>nickname</dt><dd><%= @chatter.nickname %></dd>
+      <dt>authentication code</dt><dd><%= @chatter.authentication_code %></dd>
+      <dt>expire at</dt><dd><%= @chatter.expire_at %></dd>
+    </dl>
   </div>
 </div>

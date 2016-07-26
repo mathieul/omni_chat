@@ -15,19 +15,40 @@ defmodule OmniChat.Chatter do
   def changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:phone_number, :nickname])
+    |> pick_random_nickname
+    |> validate_required([:nickname])
   end
 
   def authentication_changeset(struct, params) do
-    struct
-    |> cast(params, [:phone_number, :nickname])
+    changeset(struct, params)
     |> validate_required([:phone_number])
     |> do_normalize_phone_number
     |> validate_length(:phone_number, is: 10, message: "should be %{count} numbers long")
     |> generate_authentication_code
   end
 
+  defp pick_random_nickname(changeset) do
+    nickname = get_field(changeset, :nickname)
+
+    if empty?(nickname) do
+      nickname = Enum.join([String.downcase(Faker.Name.first_name), :rand.uniform(99)])
+      put_change(changeset, :nickname, nickname)
+    else
+      changeset
+    end
+  end
+
+  defp empty?(nil),
+    do: true
+  defp empty?(string) when is_binary(string),
+    do: String.length(String.trim(string)) == 0
+
   defp do_normalize_phone_number(changeset) do
-    normalized_number = normalize_phone_number(changeset.changes.phone_number)
+    normalized_number =
+      changeset
+      |> get_field(:phone_number)
+      |> normalize_phone_number
+
     put_change(changeset, :phone_number, normalized_number)
   end
 

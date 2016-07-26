@@ -34,9 +34,12 @@ defmodule OmniChat.ChatterController do
   end
 
   def edit(conn, _params) do
-    conn
-    |> assign(:changeset, Chatter.changeset(fetch_chatter(conn)))
-    |> render "edit.html"
+    changeset =
+      conn
+      |> fetch_chatter
+      |> Chatter.changeset
+
+    render conn, "edit.html", changeset: changeset
   end
 
   defp fetch_chatter(conn) do
@@ -46,7 +49,7 @@ defmodule OmniChat.ChatterController do
   def update(conn, %{"chatter" => %{"nickname" => nickname}}) do
     changeset = Chatter.changeset(fetch_chatter(conn), %{nickname: nickname})
     case Repo.update(changeset) do
-      {:ok, chatter} ->
+      {:ok, _chatter} ->
         conn
         |> put_flash(:notice, "Ready for action!")
         |> redirect(to: home_path(conn, :todo))
