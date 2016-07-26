@@ -14,7 +14,7 @@ defmodule OmniChat.Router do
 
     get "/", HomeController, :index
     get "/todo", HomeController, :todo
-    resources "/chatter", ChatterController, only: [:new, :create], singleton: true
+    resources "/chatter", ChatterController, only: [:new, :create, :edit, :update], singleton: true
     resources "/session", SessionController, only: [:new, :create]#, singleton: true
   end
 end

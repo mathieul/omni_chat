@@ -11,6 +11,7 @@
   <div class="jumbotron text-xs-center">
     <ul>
       <li>phone number = <%= @chatter.phone_number %></li>
+      <li>nickname = <%= @chatter.nickname %></li>
       <li>authentication code = <%= @chatter.authentication_code %></li>
       <li>expire at = <%= @chatter.expire_at %></li>
     </ul>
