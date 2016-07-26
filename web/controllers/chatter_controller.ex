@@ -10,16 +10,19 @@ defmodule OmniChat.ChatterController do
   end
 
   def create(conn, %{"chatter" => %{"phone_number" => phone_number}}) do
-    changeset = Chatter.authentication_changeset(%Chatter{}, %{phone_number: phone_number})
+    chatter =
+      phone_number
+      |> Chatter.with_phone_number
+      |> Repo.one
+
+    changeset = if chatter do
+      Chatter.changeset(chatter)
+    else
+      Chatter.authentication_changeset(%Chatter{}, %{phone_number: phone_number})
+    end
 
     if changeset.valid? do
-      # destroy any existing Chatter with this phone number
-      changeset.changes.phone_number
-      |> Chatter.with_phone_number
-      |> Repo.delete_all
-
-      # save authentication code with expiration as a new Chatter
-      chatter = Repo.insert!(changeset)
+      chatter = Repo.insert_or_update!(changeset)
 
       # send SMS with authentication code
       OmniChat.Messaging.send_message(chatter.phone_number, Chatter.authentication_message(chatter))

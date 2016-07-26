@@ -17,6 +17,7 @@ defmodule OmniChat.Chatter do
     |> cast(params, [:phone_number, :nickname])
     |> pick_random_nickname
     |> validate_required([:nickname])
+    |> unique_constraint(:nickname)
   end
 
   def authentication_changeset(struct, params) do
@@ -24,6 +25,7 @@ defmodule OmniChat.Chatter do
     |> validate_required([:phone_number])
     |> do_normalize_phone_number
     |> validate_length(:phone_number, is: 10, message: "should be %{count} numbers long")
+    |> unique_constraint(:phone_number)
     |> generate_authentication_code
   end
 
@@ -61,7 +63,7 @@ defmodule OmniChat.Chatter do
 
   def with_phone_number(number) do
     normalized_number = normalize_phone_number(number)
-    from c in "chatters", where: c.phone_number == ^normalized_number
+    from c in __MODULE__, where: c.phone_number == ^normalized_number, limit: 1
   end
 
   defp generate_authentication_code(changeset) do
