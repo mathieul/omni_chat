@@ -5,8 +5,12 @@ defmodule OmniChat.ChatterController do
   plug OmniChat.Authentication, [ auth_path: "/chatter/new" ] when action in [:edit, :update]
 
   def new(conn, _params) do
-    changeset = Chatter.changeset(%Chatter{})
-    render conn, "new.html", changeset: changeset
+    if get_session(conn, :authenticated) do
+      redirect conn, to: home_path(conn, :online)
+    else
+      changeset = Chatter.changeset(%Chatter{})
+      render conn, "new.html", changeset: changeset
+    end
   end
 
   def create(conn, %{"chatter" => %{"phone_number" => phone_number}}) do
@@ -53,9 +57,7 @@ defmodule OmniChat.ChatterController do
     changeset = Chatter.changeset(fetch_chatter(conn), %{nickname: nickname})
     case Repo.update(changeset) do
       {:ok, _chatter} ->
-        conn
-        |> put_flash(:notice, "Ready for action!")
-        |> redirect(to: home_path(conn, :todo))
+        redirect conn, to: home_path(conn, :online)
 
       {:error, changeset} ->
         render conn, "edit.html", changeset: changeset

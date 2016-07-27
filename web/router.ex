@@ -13,7 +13,7 @@ defmodule OmniChat.Router do
     pipe_through :browser
 
     get "/", HomeController, :index
-    get "/todo", HomeController, :todo
+    get "/online", HomeController, :online
     resources "/chatter", ChatterController, only: [:new, :create, :edit, :update], singleton: true
     resources "/session", SessionController, only: [:new, :create]#, singleton: true
   end
