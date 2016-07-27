@@ -3,6 +3,11 @@
     (function () {
       var node = document.getElementById('elm-main')
       var app = Elm.<%= @elm_module %>.embed(node)
+      setTimeout(function () { <%= @elm_module %>({message: "Je viens du nord."}) }, 0)
+
+      function Online(params) {
+        app.ports.initApplication.send(params.message)
+      }
     })()
   </script>
 <% end %>

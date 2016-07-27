@@ -1,15 +1,14 @@
-module Online.App exposing (initialModel, update, subscriptions, view)
+port module Online.App exposing (initialModel, update, subscriptions, view)
 
-import Html exposing (Html, div, text, h2, p, button)
+import Html exposing (Html, div, text, h2, p)
 import Html.Attributes exposing (class)
-import Html.Events exposing (onClick)
 import Json.Encode as JE
 import Json.Decode as JD exposing ((:=))
 import Phoenix.Socket
 import Phoenix.Channel
 
 
--- import Phoenix.Push
+-- MODEL
 
 
 type alias Model =
@@ -39,10 +38,13 @@ initialModel =
     }
 
 
+
+-- UPDATE
+
+
 type Msg
-    = NoOp
+    = InitApplication String
     | PhoenixMsg (Phoenix.Socket.Msg Msg)
-    | JoinChannel
     | DidJoinChannel
     | DidLeaveChannel
     | ReceiveChatMessage JE.Value
@@ -51,20 +53,11 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        NoOp ->
-            ( model, Cmd.none )
-
-        PhoenixMsg msg ->
+        InitApplication content ->
             let
-                ( phxSocket, phxCmd ) =
-                    Phoenix.Socket.update msg model.socket
-            in
-                ( { model | socket = phxSocket }
-                , Cmd.map PhoenixMsg phxCmd
-                )
+                _ =
+                    Debug.log "InitApplication message:" content
 
-        JoinChannel ->
-            let
                 channel =
                     Phoenix.Channel.init "subject:lobby"
                         |> Phoenix.Channel.withPayload userParams
@@ -83,6 +76,15 @@ update msg model =
 
         DidLeaveChannel ->
             ( { model | status = "disconnected" }, Cmd.none )
+
+        PhoenixMsg msg ->
+            let
+                ( phxSocket, phxCmd ) =
+                    Phoenix.Socket.update msg model.socket
+            in
+                ( { model | socket = phxSocket }
+                , Cmd.map PhoenixMsg phxCmd
+                )
 
         ReceiveChatMessage raw ->
             case JD.decodeValue chatMessageDecoder raw of
@@ -114,9 +116,23 @@ chatMessageDecoder =
         ("body" := JD.string)
 
 
+
+-- SUBSCRIPTIONS
+
+
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Phoenix.Socket.listen model.socket PhoenixMsg
+    Sub.batch
+        [ Phoenix.Socket.listen model.socket PhoenixMsg
+        , initApplication InitApplication
+        ]
+
+
+port initApplication : (String -> msg) -> Sub msg
+
+
+
+-- VIEW
 
 
 view : Model -> Html Msg
@@ -130,7 +146,4 @@ view model =
             [ text <| "latestMessage = " ++ model.latestMessage ]
         , p []
             [ text "TODO: implement in Elm now \x1F913!" ]
-        , button
-            [ class "btn btn-primary", onClick JoinChannel ]
-            [ text "Join Channel" ]
         ]
