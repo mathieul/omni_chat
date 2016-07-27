@@ -1,0 +1,8 @@
+<%= if @elm_module do %>
+  <script>
+    (function () {
+      var node = document.getElementById('elm-main')
+      var app = Elm.<%= @elm_module %>.embed(node)
+    })()
+  </script>
+<% end %>

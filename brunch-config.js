@@ -47,6 +47,10 @@ exports.config = {
       // Do not use ES6 compiler in vendor code
       ignore: [/web\/static\/vendor/]
     },
+    elmBrunch: {
+      mainModules: ['web/static/elm/Online.elm'],
+      outputFolder: 'web/static/vendor'
+    },
     sass: {
       options: {
         includePaths: [

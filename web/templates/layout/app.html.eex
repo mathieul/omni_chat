@@ -16,5 +16,7 @@
 
     <script src="<%= static_path(@conn, "/js/vendor.js") %>"></script>
     <script src="<%= static_path(@conn, "/js/app.js") %>"></script>
+
+    <%= render OmniChat.SharedView, "elm_init.html", elm_module: assigns[:elm_module] %>
   </body>
 </html>
