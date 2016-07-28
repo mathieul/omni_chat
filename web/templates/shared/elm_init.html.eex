@@ -3,10 +3,12 @@
     (function () {
       var node = document.getElementById('elm-main')
       var app = Elm.<%= @elm_module %>.embed(node)
-      setTimeout(function () { <%= @elm_module %>({message: "Je viens du nord."}) }, 0)
+      setTimeout(function () {
+        <%= @elm_module %>(<%= raw if @elm_flags, do: Poison.encode!(@elm_flags), else: "{}" %>)
+      }, 0)
 
       function Online(params) {
-        app.ports.initApplication.send(params.message)
+        app.ports.initApplication.send(params)
       }
     })()
   </script>

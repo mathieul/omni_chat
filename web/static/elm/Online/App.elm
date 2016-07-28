@@ -4,6 +4,7 @@ import Html exposing (Html, div, text, h2, p)
 import Html.Attributes exposing (class)
 import Json.Encode as JE
 import Json.Decode as JD exposing ((:=))
+import Dict exposing (Dict)
 import Phoenix.Socket
 import Phoenix.Channel
 
@@ -15,6 +16,28 @@ type alias Model =
     { socket : Phoenix.Socket.Socket Msg
     , status : String
     , latestMessage : String
+    , presences : PresenceState
+    }
+
+
+type alias PresenceState =
+    Dict String PresenceStateMetaWrapper
+
+
+type alias PresenceStateMetaWrapper =
+    { metas : List PresenceStateMetaValue }
+
+
+type alias PresenceStateMetaValue =
+    { phx_ref : String
+    , online_at : String
+    , device : String
+    }
+
+
+type alias PresenceDiff =
+    { leaves : PresenceState
+    , joins : PresenceState
     }
 
 
@@ -28,6 +51,8 @@ initSocket =
     Phoenix.Socket.init socketServer
         |> Phoenix.Socket.withDebug
         |> Phoenix.Socket.on "welcome" "subject:lobby" ReceiveChatMessage
+        |> Phoenix.Socket.on "presence_state" "subject:lobby" HandlePresenceState
+        |> Phoenix.Socket.on "presence_diff" "subject:lobby" HandlePresenceDiff
 
 
 initialModel : Model
@@ -35,7 +60,12 @@ initialModel =
     { socket = initSocket
     , status = "disconnected"
     , latestMessage = ""
+    , presences = Dict.empty
     }
+
+
+type alias ApplicationConfig =
+    { message : String }
 
 
 
@@ -43,16 +73,18 @@ initialModel =
 
 
 type Msg
-    = InitApplication String
+    = InitApplication ApplicationConfig
     | PhoenixMsg (Phoenix.Socket.Msg Msg)
     | DidJoinChannel
     | DidLeaveChannel
     | ReceiveChatMessage JE.Value
+    | HandlePresenceState JE.Value
+    | HandlePresenceDiff JE.Value
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of
+    case Debug.log "DEBUG>>> update:" msg of
         InitApplication content ->
             let
                 _ =
@@ -96,11 +128,42 @@ update msg model =
                 Err error ->
                     ( model, Cmd.none )
 
+        HandlePresenceState raw ->
+            case JD.decodeValue presenceStateDecoder raw of
+                Ok presenceState ->
+                    let
+                        _ =
+                            Debug.log "PresenceState" presenceState
+                    in
+                        model ! []
+
+                Err error ->
+                    let
+                        _ =
+                            Debug.log "Error" error
+                    in
+                        model ! []
+
+        HandlePresenceDiff raw ->
+            case JD.decodeValue presenceDiffDecoder raw of
+                Ok presenceDiff ->
+                    let
+                        _ =
+                            Debug.log "PresenceDiff" presenceDiff
+                    in
+                        model ! []
+
+                Err error ->
+                    let
+                        _ =
+                            Debug.log "Error" error
+                    in
+                        model ! []
+
 
 userParams : JE.Value
 userParams =
-    JE.object
-        [ ( "user_id", JE.string "42" ) ]
+    JE.object [ ( "user_id", JE.string "42" ) ]
 
 
 type alias ChatMessage =
@@ -114,6 +177,32 @@ chatMessageDecoder =
     JD.object2 ChatMessage
         ("user" := JD.string)
         ("body" := JD.string)
+
+
+presenceDiffDecoder : JD.Decoder PresenceDiff
+presenceDiffDecoder =
+    JD.object2 PresenceDiff
+        ("leaves" := presenceStateDecoder)
+        ("joins" := presenceStateDecoder)
+
+
+presenceStateDecoder : JD.Decoder PresenceState
+presenceStateDecoder =
+    JD.dict presenceStateMetaWrapperDecoder
+
+
+presenceStateMetaWrapperDecoder : JD.Decoder PresenceStateMetaWrapper
+presenceStateMetaWrapperDecoder =
+    JD.object1 PresenceStateMetaWrapper
+        ("metas" := JD.list presenceStateMetaDecoder)
+
+
+presenceStateMetaDecoder : JD.Decoder PresenceStateMetaValue
+presenceStateMetaDecoder =
+    JD.object3 PresenceStateMetaValue
+        ("phx_ref" := JD.string)
+        ("online_at" := JD.string)
+        ("device" := JD.string)
 
 
 

@@ -9,6 +9,9 @@ defmodule OmniChat.HomeController do
 
   def online(conn, _params) do
     chatter = Repo.get(OmniChat.Chatter, conn.assigns.chatter_id)
-    render conn, "online.html", chatter: chatter, elm_module: "Online"
+    elm_flags = %{"message" => "allo la terre???"}
+    render conn, "online.html", chatter: chatter,
+                                elm_module: "Online",
+                                elm_flags: elm_flags
   end
 end
