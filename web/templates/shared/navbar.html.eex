@@ -6,10 +6,11 @@
             data-target="#responsive-navbar">&#9776;</button>
   </div>
   <div id="responsive-navbar" class="navbar-toggleable-xs collapse">
+    <a class="navbar-brand" href="/online"><%= @nickname %></a>
     <nav class="nav navbar-nav">
-      <a class="nav-item nav-link" href="#">TODO1</a>
-      <a class="nav-item nav-link" href="#">TODO2</a>
-      <a class="nav-item nav-link" href="#">TODO3</a>
+      <%= link "Sign out", to: session_path(@conn, :delete),
+                           method: :delete,
+                           class: "nav-item nav-link" %>
     </nav>
   </div>
 </header>

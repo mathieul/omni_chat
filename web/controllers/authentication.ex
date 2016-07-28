@@ -20,4 +20,11 @@ defmodule OmniChat.Authentication do
       |> halt
     end
   end
+
+  def sign_out(conn) do
+    conn
+    |> put_session(:chatter_id, nil)
+    |> put_session(:authenticated, false)
+    |> assign(:chatter_id, nil)
+  end
 end

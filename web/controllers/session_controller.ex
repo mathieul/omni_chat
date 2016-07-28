@@ -28,4 +28,10 @@ defmodule OmniChat.SessionController do
       |> redirect(to: session_path(conn, :new))
     end
   end
+
+  def delete(conn, _params) do
+    conn
+    |> OmniChat.Authentication.sign_out
+    |> redirect(to: "/")
+  end
 end
