@@ -65,7 +65,9 @@ initialModel =
 
 
 type alias ApplicationConfig =
-    { message : String }
+    { nickname : String
+    , phone_number : String
+    }
 
 
 
@@ -84,7 +86,7 @@ type Msg
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case Debug.log "DEBUG>>> update:" msg of
+    case msg of
         InitApplication content ->
             let
                 _ =
@@ -217,7 +219,7 @@ subscriptions model =
         ]
 
 
-port initApplication : (String -> msg) -> Sub msg
+port initApplication : (ApplicationConfig -> msg) -> Sub msg
 
 
 
@@ -234,5 +236,5 @@ view model =
         , p [ class "lead" ]
             [ text <| "latestMessage = " ++ model.latestMessage ]
         , p []
-            [ text "TODO: implement in Elm now \x1F913!" ]
+            [ text "TODO: Implement in Elm now \x1F913!" ]
         ]
