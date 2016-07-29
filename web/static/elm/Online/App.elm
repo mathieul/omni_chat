@@ -32,7 +32,6 @@ type alias PresenceStateMetaWrapper =
 type alias PresenceStateMetaValue =
     { phx_ref : String
     , online_at : String
-    , device : String
     }
 
 
@@ -141,14 +140,14 @@ update msg model =
                 Ok presenceState ->
                     let
                         _ =
-                            Debug.log "PresenceState" presenceState
+                            Debug.log "PRESENCE STATE:" presenceState
                     in
                         model ! []
 
                 Err error ->
                     let
                         _ =
-                            Debug.log "Error" error
+                            Debug.log "ERROR:" error
                     in
                         model ! []
 
@@ -157,7 +156,7 @@ update msg model =
                 Ok presenceDiff ->
                     let
                         _ =
-                            Debug.log "PresenceDiff" presenceDiff
+                            Debug.log "PRESENCE_DIFF" presenceDiff
                     in
                         model ! []
 
@@ -211,10 +210,9 @@ presenceStateMetaWrapperDecoder =
 
 presenceStateMetaDecoder : JD.Decoder PresenceStateMetaValue
 presenceStateMetaDecoder =
-    JD.object3 PresenceStateMetaValue
+    JD.object2 PresenceStateMetaValue
         ("phx_ref" := JD.string)
         ("online_at" := JD.string)
-        ("device" := JD.string)
 
 
 
