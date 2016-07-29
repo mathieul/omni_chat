@@ -1,6 +1,6 @@
 port module Online.App exposing (initialModel, update, subscriptions, view)
 
-import Html exposing (Html, div, text, h2, p)
+import Html exposing (Html, div, text, h2, p, dl, dt, dd)
 import Html.Attributes exposing (class)
 import Json.Encode as JE
 import Json.Decode as JD exposing ((:=))
@@ -17,6 +17,7 @@ type alias Model =
     , status : String
     , latestMessage : String
     , presences : PresenceState
+    , config : ApplicationConfig
     }
 
 
@@ -61,6 +62,7 @@ initialModel =
     , status = "disconnected"
     , latestMessage = ""
     , presences = Dict.empty
+    , config = ApplicationConfig "n/a" "n/a"
     }
 
 
@@ -92,16 +94,22 @@ update msg model =
                 _ =
                     Debug.log "InitApplication message:" content
 
+                newConfig =
+                    ApplicationConfig content.nickname content.phone_number
+
                 channel =
                     Phoenix.Channel.init "subject:lobby"
-                        |> Phoenix.Channel.withPayload userParams
+                        |> Phoenix.Channel.withPayload (userParams newConfig)
                         |> Phoenix.Channel.onJoin (always <| DidJoinChannel)
                         |> Phoenix.Channel.onClose (always <| DidLeaveChannel)
 
                 ( phxSocket, phxCmd ) =
                     Phoenix.Socket.join channel model.socket
             in
-                ( { model | socket = phxSocket }
+                ( { model
+                    | socket = phxSocket
+                    , config = newConfig
+                  }
                 , Cmd.map PhoenixMsg phxCmd
                 )
 
@@ -163,9 +171,12 @@ update msg model =
                         model ! []
 
 
-userParams : JE.Value
-userParams =
-    JE.object [ ( "user_id", JE.string "42" ) ]
+userParams : ApplicationConfig -> JE.Value
+userParams config =
+    JE.object
+        [ ( "nickname", JE.string config.nickname )
+        , ( "phone_number", JE.string config.phone_number )
+        ]
 
 
 type alias ChatMessage =
@@ -231,10 +242,22 @@ view model =
     div []
         [ h2 []
             [ text "Online.elm" ]
-        , p [ class "lead" ]
-            [ text <| "status = " ++ model.status ]
-        , p [ class "lead" ]
-            [ text <| "latestMessage = " ++ model.latestMessage ]
+        , dl []
+            [ dt [] [ text "status" ]
+            , dd [] [ text model.status ]
+            ]
+        , dl []
+            [ dt [] [ text "latestMessage" ]
+            , dd [] [ text model.latestMessage ]
+            ]
+        , dl []
+            [ dt [] [ text "nickname" ]
+            , dd [] [ text model.config.nickname ]
+            ]
+        , dl []
+            [ dt [] [ text "phone_number" ]
+            , dd [] [ text model.config.phone_number ]
+            ]
         , p []
             [ text "TODO: Implement in Elm now \x1F913!" ]
         ]
