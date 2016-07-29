@@ -1,7 +1,9 @@
 module Online exposing (..)
 
 import Html.App as Html
-import Online.App exposing (..)
+import Online.App exposing (initialModel, subscriptions)
+import Online.Update exposing (update)
+import Online.View exposing (view)
 
 
 main : Program Never

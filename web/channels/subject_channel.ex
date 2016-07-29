@@ -16,8 +16,10 @@ defmodule OmniChat.SubjectChannel do
   end
 
   def handle_info(:after_join, socket) do
-    {:ok, _ } = Presence.track(socket, socket.assigns.nickname, %{
-      online_at: inspect(System.system_time(:seconds))
+    {:ok, _ } = Presence.track(socket, socket.assigns.chatter_id, %{
+      online_at: inspect(System.system_time(:seconds)),
+      nickname: socket.assigns.nickname,
+      phone_number: socket.assigns.phone_number
     })
     push socket, "welcome #{socket.assigns.nickname}", %{
       "user" => "system",
