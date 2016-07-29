@@ -62,12 +62,13 @@ initialModel =
     , status = "disconnected"
     , latestMessage = ""
     , presences = Dict.empty
-    , config = ApplicationConfig "n/a" "n/a"
+    , config = ApplicationConfig 0 "n/a" "n/a"
     }
 
 
 type alias ApplicationConfig =
-    { nickname : String
+    { chatter_id : Int
+    , nickname : String
     , phone_number : String
     }
 
@@ -91,11 +92,8 @@ update msg model =
     case msg of
         InitApplication content ->
             let
-                _ =
-                    Debug.log "InitApplication message:" content
-
                 newConfig =
-                    ApplicationConfig content.nickname content.phone_number
+                    ApplicationConfig content.chatter_id content.nickname content.phone_number
 
                 channel =
                     Phoenix.Channel.init "subject:lobby"
@@ -174,7 +172,8 @@ update msg model =
 userParams : ApplicationConfig -> JE.Value
 userParams config =
     JE.object
-        [ ( "nickname", JE.string config.nickname )
+        [ ( "chatter_id", JE.int config.chatter_id )
+        , ( "nickname", JE.string config.nickname )
         , ( "phone_number", JE.string config.phone_number )
         ]
 
