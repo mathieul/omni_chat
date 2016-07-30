@@ -26,15 +26,14 @@ type alias PresenceDiff =
     }
 
 
-type alias ApplicationConfig =
+type alias AppConfig =
     { chatter_id : Int
     , nickname : String
-    , discussion : String
     }
 
 
 type Msg
-    = InitApplication ApplicationConfig
+    = InitApplication AppConfig
     | PhoenixMsg (Phoenix.Socket.Msg Msg)
     | DidJoinChannel
     | DidLeaveChannel

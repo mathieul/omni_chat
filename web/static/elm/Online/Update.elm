@@ -1,5 +1,6 @@
 module Online.Update exposing (update)
 
+import Dict
 import Json.Decode as JD exposing ((:=))
 import Json.Encode as JE
 import Phoenix.Socket
@@ -15,10 +16,10 @@ update msg model =
             doInitApplication content model
 
         DidJoinChannel ->
-            ( { model | status = "connected" }, Cmd.none )
+            { model | status = "connected" } ! []
 
         DidLeaveChannel ->
-            ( { model | status = "disconnected" }, Cmd.none )
+            { model | status = "disconnected" } ! []
 
         PhoenixMsg phxMsg ->
             doHandlePhoenixMsg phxMsg model
@@ -33,11 +34,11 @@ update msg model =
             doProcessPresenceDiff raw model
 
 
-doInitApplication : ApplicationConfig -> Model -> ( Model, Cmd Msg )
+doInitApplication : AppConfig -> Model -> ( Model, Cmd Msg )
 doInitApplication content model =
     let
         newConfig =
-            ApplicationConfig content.chatter_id content.nickname content.discussion
+            AppConfig content.chatter_id content.nickname
 
         channel =
             Phoenix.Channel.init "discussion:hall"
@@ -71,12 +72,10 @@ doProcessMessageReceived : JE.Value -> Model -> ( Model, Cmd Msg )
 doProcessMessageReceived raw model =
     case JD.decodeValue chatMessageDecoder raw of
         Ok content ->
-            ( { model | latestMessage = content.body }
-            , Cmd.none
-            )
+            { model | latestMessage = content.body } ! []
 
         Err error ->
-            ( model, Cmd.none )
+            model ! []
 
 
 doProcessPresenceState : JE.Value -> Model -> ( Model, Cmd Msg )
@@ -104,8 +103,25 @@ doProcessPresenceDiff raw model =
             let
                 _ =
                     Debug.log "PRESENCE_DIFF" presenceDiff
+
+                presencesAfterDel =
+                    Dict.keys presenceDiff.leaves
+                        |> List.foldl Dict.remove model.presences
+
+                presencesAfterAdd =
+                    Dict.keys presenceDiff.joins
+                        |> List.foldl
+                            (\id presences ->
+                                case Dict.get id presenceDiff.joins of
+                                    Just value ->
+                                        Dict.insert id value presences
+
+                                    Nothing ->
+                                        presences
+                            )
+                            presencesAfterDel
             in
-                model ! []
+                { model | presences = presencesAfterAdd } ! []
 
         Err error ->
             let
@@ -115,12 +131,11 @@ doProcessPresenceDiff raw model =
                 model ! []
 
 
-userParams : ApplicationConfig -> JE.Value
+userParams : AppConfig -> JE.Value
 userParams config =
     JE.object
         [ ( "chatter_id", JE.int config.chatter_id )
         , ( "nickname", JE.string config.nickname )
-        , ( "discussion", JE.string config.discussion )
         ]
 
 

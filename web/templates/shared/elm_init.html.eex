@@ -4,7 +4,7 @@
       var node = document.getElementById('elm-main')
       var app = Elm.<%= @elm_module %>.embed(node)
       setTimeout(function () {
-        <%= @elm_module %>(<%= raw if @elm_flags, do: Poison.encode!(@elm_flags), else: "{}" %>)
+        <%= @elm_module %>(<%= raw if @elm_app_config, do: Poison.encode!(@elm_app_config), else: "{}" %>)
       }, 0)
 
       function Online(params) {

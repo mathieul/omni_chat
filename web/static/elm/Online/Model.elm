@@ -13,7 +13,7 @@ type alias Model =
     , status : String
     , latestMessage : String
     , presences : PresenceState
-    , config : ApplicationConfig
+    , config : AppConfig
     }
 
 
@@ -25,10 +25,13 @@ socketServer =
 initSocket : Phoenix.Socket.Socket Msg
 initSocket =
     Phoenix.Socket.init socketServer
-        |> Phoenix.Socket.withDebug
         |> Phoenix.Socket.on "init" "discussion:hall" ReceiveChatMessage
         |> Phoenix.Socket.on "presence_state" "discussion:hall" HandlePresenceState
         |> Phoenix.Socket.on "presence_diff" "discussion:hall" HandlePresenceDiff
+
+
+
+-- |> Phoenix.Socket.withDebug
 
 
 initialModel : Model
@@ -37,7 +40,7 @@ initialModel =
     , status = "disconnected"
     , latestMessage = ""
     , presences = Dict.empty
-    , config = ApplicationConfig 0 "n/a" "n/a"
+    , config = AppConfig 0 "n/a"
     }
 
 
@@ -53,4 +56,4 @@ subscriptions model =
         ]
 
 
-port initApplication : (ApplicationConfig -> msg) -> Sub msg
+port initApplication : (AppConfig -> msg) -> Sub msg
