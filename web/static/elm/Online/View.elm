@@ -21,6 +21,7 @@ view model =
                 ]
             )
         , div [] [ text <| "present: " ++ (presentNicknames model.presences) ]
+        , div [] [ text <| "discussions: " ++ (toString model.discussions) ]
         ]
 
 

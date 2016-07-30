@@ -17,11 +17,12 @@ type alias AppConfig =
 type Msg
     = InitApplication AppConfig
     | PhoenixMsg (Phoenix.Socket.Msg Msg)
+    | HandlePresenceState Value
+    | HandlePresenceDiff Value
     | DidJoinChannel
     | DidLeaveChannel
     | ReceiveChatMessage Value
-    | HandlePresenceState Value
-    | HandlePresenceDiff Value
+    | ReceiveAllDiscussions Value
 
 
 
@@ -41,3 +42,18 @@ type alias PresenceStateMetaValue =
     , online_at : String
     , nickname : String
     }
+
+
+
+-- Discussion
+
+
+type alias Discussion =
+    { subject : String
+    , participants : List Participant
+    , last_activity_at : String
+    }
+
+
+type alias Participant =
+    { nickname : String }

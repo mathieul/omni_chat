@@ -13,6 +13,7 @@ type alias Model =
     , status : String
     , latestMessage : String
     , presences : PresenceState
+    , discussions : List Discussion
     , config : AppConfig
     }
 
@@ -22,12 +23,18 @@ socketServer =
     "ws://localhost:4000/socket/websocket"
 
 
+hallChannel : String
+hallChannel =
+    "discussion:hall"
+
+
 initSocket : Phoenix.Socket.Socket Msg
 initSocket =
     Phoenix.Socket.init socketServer
-        |> Phoenix.Socket.on "init" "discussion:hall" ReceiveChatMessage
-        |> Phoenix.Socket.on "presence_state" "discussion:hall" HandlePresenceState
-        |> Phoenix.Socket.on "presence_diff" "discussion:hall" HandlePresenceDiff
+        |> Phoenix.Socket.on "init" hallChannel ReceiveChatMessage
+        |> Phoenix.Socket.on "all_discussions" hallChannel ReceiveAllDiscussions
+        |> Phoenix.Socket.on "presence_state" hallChannel HandlePresenceState
+        |> Phoenix.Socket.on "presence_diff" hallChannel HandlePresenceDiff
 
 
 
@@ -40,6 +47,7 @@ initialModel =
     , status = "disconnected"
     , latestMessage = ""
     , presences = Dict.empty
+    , discussions = []
     , config = AppConfig 0 "n/a"
     }
 

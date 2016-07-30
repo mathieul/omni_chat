@@ -7,6 +7,7 @@ import Phoenix.Channel
 import Online.Types exposing (..)
 import Online.Model exposing (Model)
 import Online.Presence as Presence
+import Online.Discussion as Discussion
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -26,6 +27,9 @@ update msg model =
 
         ReceiveChatMessage raw ->
             doProcessMessageReceived raw model
+
+        ReceiveAllDiscussions raw ->
+            Discussion.receiveAll raw model
 
         HandlePresenceState raw ->
             (Presence.processPresenceState raw model) ! []
