@@ -19,10 +19,10 @@ update msg model =
             doHandlePhoenixMsg phxMsg model
 
         DidJoinChannel ->
-            { model | status = "connected" } ! []
+            { model | connected = True } ! []
 
         DidLeaveChannel ->
-            { model | status = "disconnected" } ! []
+            { model | connected = False } ! []
 
         ReceiveAllDiscussions raw ->
             Discussion.receiveAll raw model

@@ -10,7 +10,7 @@ import Online.Types exposing (..)
 
 type alias Model =
     { socket : Phoenix.Socket.Socket Msg
-    , status : String
+    , connected : Bool
     , presences : PresenceState
     , discussions : List Discussion
     , config : AppConfig
@@ -42,7 +42,7 @@ initSocket =
 initialModel : Model
 initialModel =
     { socket = initSocket
-    , status = "disconnected"
+    , connected = False
     , presences = Dict.empty
     , discussions = []
     , config = AppConfig 0 "n/a"

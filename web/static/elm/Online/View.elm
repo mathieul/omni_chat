@@ -1,7 +1,7 @@
 module Online.View exposing (view)
 
-import Html exposing (Html, div, text, h3, p, dl, dt, dd, a, ul, li)
-import Html.Attributes exposing (class, href)
+import Html exposing (Html, div, header, text, i, h4, p, dl, dt, dd, a, ul, li)
+import Html.Attributes exposing (class, classList, href)
 import Dict
 import String
 import Online.Types exposing (..)
@@ -10,10 +10,34 @@ import Online.Model exposing (Model)
 
 view : Model -> Html Msg
 view model =
-    div [ class "container" ]
+    div []
+        [ topBar model
+        , div [ class "container with-fixed-top-navbar" ]
+            [ div
+                [ class "card-columns" ]
+                (List.map discussionCardView model.discussions)
+            ]
+        ]
+
+
+topBar : Model -> Html Msg
+topBar model =
+    header
+        [ class "navbar navbar-fixed-top navbar-dark bg-primary" ]
         [ div
-            [ class "card-columns" ]
-            (List.map discussionCardView model.discussions)
+            [ class "nav navbar-nav" ]
+            [ div [ class "navbar-brand" ] [ text model.config.nickname ] ]
+        , div
+            [ class "nav navbar-nav pull-right" ]
+            [ i
+                [ classList
+                    [ ( "fa", True )
+                    , ( "fa fa-spinner fa-pulse fa-fw", not model.connected )
+                    , ( "fa fa-wifi", model.connected )
+                    ]
+                ]
+                []
+            ]
         ]
 
 
@@ -21,7 +45,7 @@ discussionCardView : Discussion -> Html Msg
 discussionCardView discussion =
     div [ class "card" ]
         [ div [ class "card-block" ]
-            [ h3
+            [ h4
                 [ class "card-title text-xs-center" ]
                 [ text discussion.subject ]
             , div [ class "row m-t-2" ]
@@ -54,11 +78,11 @@ participantLine participant =
 viewDebug : Model -> Html Msg
 viewDebug model =
     div [ class "container" ]
-        [ h3 []
+        [ h4 []
             [ text "Online.elm" ]
         , div []
             (List.map keyValuePair
-                [ ( "status", model.status )
+                [ ( "connected", toString model.connected )
                 , ( "nickname", model.config.nickname )
                 , ( "present", presentNicknames model.presences )
                 , ( "discussions", toString model.discussions )
