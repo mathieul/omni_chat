@@ -1,8 +1,8 @@
-<%= render OmniChat.SharedView, "navbar.html",
-           conn: @conn,
-           nickname: @chatter.nickname,
-           phone_number: @chatter.phone_number %>
+<%=
+  # render OmniChat.SharedView, "navbar.html",
+  #          conn: @conn,
+  #          nickname: @chatter.nickname,
+  #          phone_number: @chatter.phone_number
+%>
 
-<div class="container with-fixed-top-navbar">
-  <div id="elm-main"></div>
-</div>
+<div id="elm-main"></div>
