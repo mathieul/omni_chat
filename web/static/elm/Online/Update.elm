@@ -4,7 +4,8 @@ import Json.Decode as JD exposing ((:=))
 import Json.Encode as JE
 import Phoenix.Socket
 import Phoenix.Channel
-import Online.Model exposing (..)
+import Online.Types exposing (..)
+import Online.Model exposing (Model)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -39,7 +40,7 @@ doInitApplication content model =
             ApplicationConfig content.chatter_id content.nickname content.phone_number
 
         channel =
-            Phoenix.Channel.init "subject:lobby"
+            Phoenix.Channel.init "discussion:hall"
                 |> Phoenix.Channel.withPayload (userParams newConfig)
                 |> Phoenix.Channel.onJoin (always <| DidJoinChannel)
                 |> Phoenix.Channel.onClose (always <| DidLeaveChannel)

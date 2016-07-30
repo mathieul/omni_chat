@@ -1,8 +1,11 @@
-module Online.Model exposing (..)
+port module Online.Model exposing (Model, initialModel, subscriptions)
 
-import Phoenix.Socket
-import Json.Encode exposing (Value)
 import Dict exposing (Dict)
+import Phoenix.Socket
+import Online.Types exposing (..)
+
+
+-- MODEL
 
 
 type alias Model =
@@ -14,40 +17,40 @@ type alias Model =
     }
 
 
-type alias PresenceState =
-    Dict String PresenceStateMetaWrapper
+socketServer : String
+socketServer =
+    "ws://localhost:4000/socket/websocket"
 
 
-type alias PresenceStateMetaWrapper =
-    { metas : List PresenceStateMetaValue }
+initSocket : Phoenix.Socket.Socket Msg
+initSocket =
+    Phoenix.Socket.init socketServer
+        |> Phoenix.Socket.withDebug
+        |> Phoenix.Socket.on "init" "discussion:hall" ReceiveChatMessage
+        |> Phoenix.Socket.on "presence_state" "discussion:hall" HandlePresenceState
+        |> Phoenix.Socket.on "presence_diff" "discussion:hall" HandlePresenceDiff
 
 
-type alias PresenceStateMetaValue =
-    { phx_ref : String
-    , online_at : String
-    , nickname : String
-    , phone_number : String
+initialModel : Model
+initialModel =
+    { socket = initSocket
+    , status = "disconnected"
+    , latestMessage = ""
+    , presences = Dict.empty
+    , config = ApplicationConfig 0 "n/a" "n/a"
     }
 
 
-type alias PresenceDiff =
-    { leaves : PresenceState
-    , joins : PresenceState
-    }
+
+-- SUBSCRIPTIONS
 
 
-type alias ApplicationConfig =
-    { chatter_id : Int
-    , nickname : String
-    , phone_number : String
-    }
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.batch
+        [ Phoenix.Socket.listen model.socket PhoenixMsg
+        , initApplication InitApplication
+        ]
 
 
-type Msg
-    = InitApplication ApplicationConfig
-    | PhoenixMsg (Phoenix.Socket.Msg Msg)
-    | DidJoinChannel
-    | DidLeaveChannel
-    | ReceiveChatMessage Value
-    | HandlePresenceState Value
-    | HandlePresenceDiff Value
+port initApplication : (ApplicationConfig -> msg) -> Sub msg

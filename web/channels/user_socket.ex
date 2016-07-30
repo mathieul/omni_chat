@@ -2,7 +2,8 @@ defmodule OmniChat.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-  channel "subject:lobby", OmniChat.SubjectChannel
+  channel "discussion:*", OmniChat.DiscussionChannel
+  # channel "subject:lobby", OmniChat.SubjectChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket

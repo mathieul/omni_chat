@@ -2,7 +2,8 @@ module Online.View exposing (view)
 
 import Html exposing (Html, div, text, h2, p, dl, dt, dd)
 import Html.Attributes exposing (class)
-import Online.Model exposing (..)
+import Online.Types exposing (..)
+import Online.Model exposing (Model)
 
 
 view : Model -> Html Msg
