@@ -15,23 +15,23 @@ update msg model =
         InitApplication content ->
             doInitApplication content model
 
+        PhoenixMsg phxMsg ->
+            doHandlePhoenixMsg phxMsg model
+
         DidJoinChannel ->
             { model | status = "connected" } ! []
 
         DidLeaveChannel ->
             { model | status = "disconnected" } ! []
 
-        PhoenixMsg phxMsg ->
-            doHandlePhoenixMsg phxMsg model
-
         ReceiveChatMessage raw ->
             doProcessMessageReceived raw model
 
         HandlePresenceState raw ->
-            Presence.processPresenceState raw model
+            (Presence.processPresenceState raw model) ! []
 
         HandlePresenceDiff raw ->
-            Presence.processPresenceDiff raw model
+            (Presence.processPresenceDiff raw model) ! []
 
 
 doInitApplication : AppConfig -> Model -> ( Model, Cmd Msg )
@@ -43,8 +43,8 @@ doInitApplication content model =
         channel =
             Phoenix.Channel.init "discussion:hall"
                 |> Phoenix.Channel.withPayload (userParams newConfig)
-                |> Phoenix.Channel.onJoin (always <| DidJoinChannel)
-                |> Phoenix.Channel.onClose (always <| DidLeaveChannel)
+                |> Phoenix.Channel.onJoin (always DidJoinChannel)
+                |> Phoenix.Channel.onClose (always DidLeaveChannel)
 
         ( phxSocket, phxCmd ) =
             Phoenix.Socket.join channel model.socket

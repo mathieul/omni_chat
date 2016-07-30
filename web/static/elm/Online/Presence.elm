@@ -19,17 +19,17 @@ type alias PresenceDiff =
     }
 
 
-processPresenceState : JE.Value -> Model -> ( Model, Cmd Msg )
+processPresenceState : JE.Value -> Model -> Model
 processPresenceState raw model =
     case JD.decodeValue presenceStateDecoder raw of
         Ok presenceState ->
-            { model | presences = presenceState } ! []
+            { model | presences = presenceState }
 
         Err error ->
-            model ! []
+            model
 
 
-processPresenceDiff : JE.Value -> Model -> ( Model, Cmd Msg )
+processPresenceDiff : JE.Value -> Model -> Model
 processPresenceDiff raw model =
     case JD.decodeValue presenceDiffDecoder raw of
         Ok presenceDiff ->
@@ -55,10 +55,10 @@ processPresenceDiff raw model =
                         |> Dict.keys
                         |> List.foldl insertPresence presencesAfterDel
             in
-                { model | presences = presencesAfterAdd } ! []
+                { model | presences = presencesAfterAdd }
 
         Err error ->
-            model ! []
+            model
 
 
 presenceDiffDecoder : JD.Decoder PresenceDiff
