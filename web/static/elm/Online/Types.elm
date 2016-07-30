@@ -21,7 +21,6 @@ type Msg
     | HandlePresenceDiff Value
     | DidJoinChannel
     | DidLeaveChannel
-    | ReceiveChatMessage Value
     | ReceiveAllDiscussions Value
 
 

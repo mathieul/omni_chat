@@ -19,10 +19,14 @@ defmodule OmniChat.DiscussionChannel do
   def handle_info(:after_join, socket) do
     track_presence(socket)
     push socket, "presence_state", Presence.list(socket)
-    push socket, "init", %{
-      "user" => socket.assigns.nickname,
-      "body" => "Your id is #{socket.assigns.chatter_id} and discussion is #{socket.assigns.discussion}",
-      "presences" => Presence.list(socket)
+    push socket, "all_discussions", %{
+      discussions: [
+        %{
+          "subject" => "test subject",
+          "participants" => [%{"nickname" => "mathieu"}, %{"nickname" => "zlaj"}],
+          "last_activity_at" => "some datetime value"
+        }
+      ]
     }
 
     {:noreply, socket}

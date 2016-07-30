@@ -11,7 +11,6 @@ import Online.Types exposing (..)
 type alias Model =
     { socket : Phoenix.Socket.Socket Msg
     , status : String
-    , latestMessage : String
     , presences : PresenceState
     , discussions : List Discussion
     , config : AppConfig
@@ -31,7 +30,6 @@ hallChannel =
 initSocket : Phoenix.Socket.Socket Msg
 initSocket =
     Phoenix.Socket.init socketServer
-        |> Phoenix.Socket.on "init" hallChannel ReceiveChatMessage
         |> Phoenix.Socket.on "all_discussions" hallChannel ReceiveAllDiscussions
         |> Phoenix.Socket.on "presence_state" hallChannel HandlePresenceState
         |> Phoenix.Socket.on "presence_diff" hallChannel HandlePresenceDiff
@@ -45,7 +43,6 @@ initialModel : Model
 initialModel =
     { socket = initSocket
     , status = "disconnected"
-    , latestMessage = ""
     , presences = Dict.empty
     , discussions = []
     , config = AppConfig 0 "n/a"

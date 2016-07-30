@@ -1,6 +1,5 @@
 module Online.Update exposing (update)
 
-import Json.Decode as JD exposing ((:=))
 import Json.Encode as JE
 import Phoenix.Socket
 import Phoenix.Channel
@@ -24,9 +23,6 @@ update msg model =
 
         DidLeaveChannel ->
             { model | status = "disconnected" } ! []
-
-        ReceiveChatMessage raw ->
-            doProcessMessageReceived raw model
 
         ReceiveAllDiscussions raw ->
             Discussion.receiveAll raw model
@@ -72,32 +68,9 @@ doHandlePhoenixMsg phxMsg model =
         )
 
 
-doProcessMessageReceived : JE.Value -> Model -> ( Model, Cmd Msg )
-doProcessMessageReceived raw model =
-    case JD.decodeValue chatMessageDecoder raw of
-        Ok content ->
-            { model | latestMessage = content.body } ! []
-
-        Err error ->
-            model ! []
-
-
 userParams : AppConfig -> JE.Value
 userParams config =
     JE.object
         [ ( "chatter_id", JE.int config.chatter_id )
         , ( "nickname", JE.string config.nickname )
         ]
-
-
-type alias ChatMessage =
-    { user : String
-    , body : String
-    }
-
-
-chatMessageDecoder : JD.Decoder ChatMessage
-chatMessageDecoder =
-    JD.object2 ChatMessage
-        ("user" := JD.string)
-        ("body" := JD.string)

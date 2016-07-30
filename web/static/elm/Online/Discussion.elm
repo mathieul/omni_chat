@@ -6,19 +6,32 @@ import Online.Model exposing (Model)
 import Online.Types exposing (Msg, Discussion, Participant)
 
 
+type alias AllDiscussionsWrapper =
+    { discussions : List Discussion }
+
+
 receiveAll : JE.Value -> Model -> ( Model, Cmd Msg )
 receiveAll raw model =
     case JD.decodeValue collectionDecoder raw of
         Ok content ->
-            model ! []
+            let
+                _ =
+                    Debug.log "CONTENT: " content
+            in
+                { model | discussions = content.discussions } ! []
 
         Err error ->
-            model ! []
+            let
+                _ =
+                    Debug.log "ERROR: " error
+            in
+                model ! []
 
 
-collectionDecoder : JD.Decoder (List Discussion)
+collectionDecoder : JD.Decoder AllDiscussionsWrapper
 collectionDecoder =
-    JD.list discussionDecoder
+    JD.object1 AllDiscussionsWrapper
+        ("discussions" := JD.list discussionDecoder)
 
 
 discussionDecoder : JD.Decoder Discussion

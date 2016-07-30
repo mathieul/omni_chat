@@ -16,12 +16,11 @@ view model =
         , div []
             (List.map keyValuePair
                 [ ( "status", model.status )
-                , ( "latestMessage", model.latestMessage )
                 , ( "nickname", model.config.nickname )
+                , ( "present", presentNicknames model.presences )
+                , ( "discussions", toString model.discussions )
                 ]
             )
-        , div [] [ text <| "present: " ++ (presentNicknames model.presences) ]
-        , div [] [ text <| "discussions: " ++ (toString model.discussions) ]
         ]
 
 
