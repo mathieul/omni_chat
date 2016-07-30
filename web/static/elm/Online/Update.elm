@@ -1,12 +1,12 @@
 module Online.Update exposing (update)
 
-import Dict
 import Json.Decode as JD exposing ((:=))
 import Json.Encode as JE
 import Phoenix.Socket
 import Phoenix.Channel
 import Online.Types exposing (..)
 import Online.Model exposing (Model)
+import Online.Presence as Presence
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -28,10 +28,10 @@ update msg model =
             doProcessMessageReceived raw model
 
         HandlePresenceState raw ->
-            doProcessPresenceState raw model
+            Presence.processPresenceState raw model
 
         HandlePresenceDiff raw ->
-            doProcessPresenceDiff raw model
+            Presence.processPresenceDiff raw model
 
 
 doInitApplication : AppConfig -> Model -> ( Model, Cmd Msg )
@@ -78,47 +78,6 @@ doProcessMessageReceived raw model =
             model ! []
 
 
-doProcessPresenceState : JE.Value -> Model -> ( Model, Cmd Msg )
-doProcessPresenceState raw model =
-    case JD.decodeValue presenceStateDecoder raw of
-        Ok presenceState ->
-            { model | presences = presenceState } ! []
-
-        Err error ->
-            model ! []
-
-
-doProcessPresenceDiff : JE.Value -> Model -> ( Model, Cmd Msg )
-doProcessPresenceDiff raw model =
-    case JD.decodeValue presenceDiffDecoder raw of
-        Ok presenceDiff ->
-            let
-                _ =
-                    Debug.log "PRESENCE_DIFF" presenceDiff
-
-                presencesAfterDel =
-                    Dict.keys presenceDiff.leaves
-                        |> List.foldl Dict.remove model.presences
-
-                presencesAfterAdd =
-                    Dict.keys presenceDiff.joins
-                        |> List.foldl
-                            (\id presences ->
-                                case Dict.get id presenceDiff.joins of
-                                    Just value ->
-                                        Dict.insert id value presences
-
-                                    Nothing ->
-                                        presences
-                            )
-                            presencesAfterDel
-            in
-                { model | presences = presencesAfterAdd } ! []
-
-        Err error ->
-            model ! []
-
-
 userParams : AppConfig -> JE.Value
 userParams config =
     JE.object
@@ -138,29 +97,3 @@ chatMessageDecoder =
     JD.object2 ChatMessage
         ("user" := JD.string)
         ("body" := JD.string)
-
-
-presenceDiffDecoder : JD.Decoder PresenceDiff
-presenceDiffDecoder =
-    JD.object2 PresenceDiff
-        ("leaves" := presenceStateDecoder)
-        ("joins" := presenceStateDecoder)
-
-
-presenceStateDecoder : JD.Decoder PresenceState
-presenceStateDecoder =
-    JD.dict presenceStateMetaWrapperDecoder
-
-
-presenceStateMetaWrapperDecoder : JD.Decoder PresenceStateMetaWrapper
-presenceStateMetaWrapperDecoder =
-    JD.object1 PresenceStateMetaWrapper
-        ("metas" := JD.list presenceStateMetaDecoder)
-
-
-presenceStateMetaDecoder : JD.Decoder PresenceStateMetaValue
-presenceStateMetaDecoder =
-    JD.object3 PresenceStateMetaValue
-        ("phx_ref" := JD.string)
-        ("online_at" := JD.string)
-        ("nickname" := JD.string)
