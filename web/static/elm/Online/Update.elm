@@ -7,6 +7,7 @@ import Online.Types exposing (..)
 import Online.Model exposing (Model)
 import Online.Presence as Presence
 import Online.Discussion as Discussion
+import Components.DiscussionEditor as DiscussionEditor
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -17,6 +18,13 @@ update msg model =
 
         PhoenixMsg phxMsg ->
             doHandlePhoenixMsg phxMsg model
+
+        DiscussionEditorMsg deMsg ->
+            let
+                discussionEditorModel =
+                    DiscussionEditor.update deMsg model.discussionEditorModel
+            in
+                { model | discussionEditorModel = discussionEditorModel } ! []
 
         DidJoinChannel ->
             { model | connected = True } ! []

@@ -6,18 +6,26 @@ import Dict
 import String
 import Online.Types exposing (..)
 import Online.Model exposing (Model)
+import Components.DiscussionEditor as DiscussionEditor
 
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ topBar model
-        , div [ class "container with-fixed-top-navbar" ]
-            [ div
-                [ class "card-columns" ]
-                (List.map discussionCardView model.discussions)
+    let
+        discussionEditorView =
+            DiscussionEditor.view model.discussionEditorModel
+
+        discussionsView =
+            List.map discussionCardView model.discussions
+    in
+        div []
+            [ topBar model
+            , div [ class "container with-fixed-top-navbar" ]
+                [ div
+                    [ class "card-columns" ]
+                    (discussionEditorView :: discussionsView)
+                ]
             ]
-        ]
 
 
 topBar : Model -> Html Msg

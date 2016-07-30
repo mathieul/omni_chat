@@ -3,6 +3,7 @@ port module Online.Model exposing (Model, initialModel, subscriptions)
 import Dict exposing (Dict)
 import Phoenix.Socket
 import Online.Types exposing (..)
+import Components.DiscussionEditor as DiscussionEditor
 
 
 -- MODEL
@@ -14,6 +15,7 @@ type alias Model =
     , presences : PresenceState
     , discussions : List Discussion
     , config : AppConfig
+    , discussionEditorModel : DiscussionEditor.Model
     }
 
 
@@ -46,6 +48,7 @@ initialModel =
     , presences = Dict.empty
     , discussions = []
     , config = AppConfig 0 "n/a"
+    , discussionEditorModel = DiscussionEditor.initialModel
     }
 
 

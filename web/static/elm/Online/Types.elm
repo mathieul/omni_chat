@@ -3,6 +3,7 @@ module Online.Types exposing (..)
 import Dict exposing (Dict)
 import Phoenix.Socket
 import Json.Encode exposing (Value)
+import Components.DiscussionEditor as DiscussionEditor
 
 
 -- Update
@@ -22,6 +23,7 @@ type Msg
     | DidJoinChannel
     | DidLeaveChannel
     | ReceiveAllDiscussions Value
+    | DiscussionEditorMsg DiscussionEditor.Msg
 
 
 
