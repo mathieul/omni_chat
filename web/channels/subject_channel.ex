@@ -21,8 +21,8 @@ defmodule OmniChat.SubjectChannel do
       nickname: socket.assigns.nickname,
       phone_number: socket.assigns.phone_number
     })
-    push socket, "welcome #{socket.assigns.nickname}", %{
-      "user" => "system",
+    push socket, "welcome", %{
+      "user" => socket.assigns.nickname,
       "body" => "Your phone number is #{socket.assigns.phone_number} and id=#{socket.assigns.chatter_id}",
       "presences" => Presence.list(socket)
     }

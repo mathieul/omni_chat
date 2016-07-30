@@ -91,7 +91,7 @@ doProcessPresenceState raw model =
         Err error ->
             let
                 _ =
-                    Debug.log "ERROR:" error
+                    Debug.log "ERROR(STATE):" error
             in
                 model ! []
 
@@ -109,7 +109,7 @@ doProcessPresenceDiff raw model =
         Err error ->
             let
                 _ =
-                    Debug.log "Error" error
+                    Debug.log "Error(DIFF)" error
             in
                 model ! []
 
