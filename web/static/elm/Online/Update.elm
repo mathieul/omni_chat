@@ -82,18 +82,10 @@ doProcessPresenceState : JE.Value -> Model -> ( Model, Cmd Msg )
 doProcessPresenceState raw model =
     case JD.decodeValue presenceStateDecoder raw of
         Ok presenceState ->
-            let
-                _ =
-                    Debug.log "PRESENCE STATE:" presenceState
-            in
-                model ! []
+            { model | presences = presenceState } ! []
 
         Err error ->
-            let
-                _ =
-                    Debug.log "ERROR(STATE):" error
-            in
-                model ! []
+            model ! []
 
 
 doProcessPresenceDiff : JE.Value -> Model -> ( Model, Cmd Msg )
@@ -124,11 +116,7 @@ doProcessPresenceDiff raw model =
                 { model | presences = presencesAfterAdd } ! []
 
         Err error ->
-            let
-                _ =
-                    Debug.log "Error(DIFF)" error
-            in
-                model ! []
+            model ! []
 
 
 userParams : AppConfig -> JE.Value
