@@ -37,7 +37,7 @@ doInitApplication : ApplicationConfig -> Model -> ( Model, Cmd Msg )
 doInitApplication content model =
     let
         newConfig =
-            ApplicationConfig content.chatter_id content.nickname content.phone_number
+            ApplicationConfig content.chatter_id content.nickname content.discussion
 
         channel =
             Phoenix.Channel.init "discussion:hall"
@@ -120,7 +120,7 @@ userParams config =
     JE.object
         [ ( "chatter_id", JE.int config.chatter_id )
         , ( "nickname", JE.string config.nickname )
-        , ( "phone_number", JE.string config.phone_number )
+        , ( "discussion", JE.string config.discussion )
         ]
 
 
@@ -157,8 +157,7 @@ presenceStateMetaWrapperDecoder =
 
 presenceStateMetaDecoder : JD.Decoder PresenceStateMetaValue
 presenceStateMetaDecoder =
-    JD.object4 PresenceStateMetaValue
+    JD.object3 PresenceStateMetaValue
         ("phx_ref" := JD.string)
         ("online_at" := JD.string)
         ("nickname" := JD.string)
-        ("phone_number" := JD.string)

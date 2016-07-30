@@ -17,7 +17,6 @@ type alias PresenceStateMetaValue =
     { phx_ref : String
     , online_at : String
     , nickname : String
-    , phone_number : String
     }
 
 
@@ -30,7 +29,7 @@ type alias PresenceDiff =
 type alias ApplicationConfig =
     { chatter_id : Int
     , nickname : String
-    , phone_number : String
+    , discussion : String
     }
 
 

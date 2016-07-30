@@ -16,7 +16,6 @@ view model =
                 [ ( "status", model.status )
                 , ( "latestMessage", model.latestMessage )
                 , ( "nickname", model.config.nickname )
-                , ( "phone_number", model.config.phone_number )
                 ]
             )
         ]

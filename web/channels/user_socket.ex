@@ -3,7 +3,6 @@ defmodule OmniChat.UserSocket do
 
   ## Channels
   channel "discussion:*", OmniChat.DiscussionChannel
-  # channel "subject:lobby", OmniChat.SubjectChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket
