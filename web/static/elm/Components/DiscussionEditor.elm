@@ -2,6 +2,7 @@ module Components.DiscussionEditor
     exposing
         ( Model
         , Msg
+        , OutMsg(..)
         , initialModel
         , update
         , view
@@ -26,31 +27,36 @@ initialModel =
 
 
 type Msg
-    = NoOp
-    | StartEditing
+    = StartEditing
     | StopEditing
     | UpdateSubject String
     | CreateDiscussion String
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+type OutMsg
+    = DiscussionCreationRequested String
+
+
+update : Msg -> Model -> ( Model, Cmd Msg, Maybe OutMsg )
 update msg model =
     case msg of
-        NoOp ->
-            model ! []
-
         StartEditing ->
-            { model | editing = True } ! []
+            ( { model | editing = True }, Cmd.none, Nothing )
 
         StopEditing ->
-            { model | editing = False } ! []
+            ( { model | editing = False }, Cmd.none, Nothing )
 
         UpdateSubject subject ->
-            { model | subject = subject } ! []
+            ( { model | subject = subject }, Cmd.none, Nothing )
 
         CreateDiscussion subject ->
-            -- TODO: pass action to parent
-            ( { model | subject = "", editing = False }, Cmd.none )
+            ( { model
+                | subject = ""
+                , editing = False
+              }
+            , Cmd.none
+            , Just (DiscussionCreationRequested subject)
+            )
 
 
 view : Model -> Html Msg

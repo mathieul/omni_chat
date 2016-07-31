@@ -3,6 +3,7 @@ module Online.Update exposing (update)
 import Json.Encode as JE
 import Phoenix.Socket
 import Phoenix.Channel
+import OutMessage
 import Online.Types exposing (..)
 import Online.Model exposing (Model)
 import Online.Presence as Presence
@@ -20,14 +21,21 @@ update msg model =
             doHandlePhoenixMsg phxMsg model
 
         DiscussionEditorMsg deMsg ->
-            let
-                ( deModel, deCmds ) =
-                    DiscussionEditor.update deMsg model.discussionEditorModel
-            in
-                ( { model | discussionEditorModel = deModel }
-                , Cmd.map DiscussionEditorMsg deCmds
-                )
+            DiscussionEditor.update deMsg model.discussionEditorModel
+                |> OutMessage.mapComponent
+                    (\discussionEditorModel ->
+                        { model | discussionEditorModel = discussionEditorModel }
+                    )
+                |> OutMessage.mapCmd DiscussionEditorMsg
+                |> OutMessage.evaluateMaybe interpretOutMsg Cmd.none
 
+        -- let
+        --     ( deModel, deCmds ) =
+        --         DiscussionEditor.update deMsg model.discussionEditorModel
+        -- in
+        --     ( { model | discussionEditorModel = deModel }
+        --     , Cmd.map DiscussionEditorMsg deCmds
+        --     )
         DidJoinChannel ->
             { model | connected = True } ! []
 
@@ -42,6 +50,17 @@ update msg model =
 
         HandlePresenceDiff raw ->
             (Presence.processPresenceDiff raw model) ! []
+
+
+interpretOutMsg : DiscussionEditor.OutMsg -> Model -> ( Model, Cmd Msg )
+interpretOutMsg outmsg model =
+    case outmsg of
+        DiscussionEditor.DiscussionCreationRequested subject ->
+            let
+                _ =
+                    Debug.log "DEBUG>>> subject =" subject
+            in
+                ( model, Cmd.none )
 
 
 doInitApplication : AppConfig -> Model -> ( Model, Cmd Msg )
