@@ -1,5 +1,6 @@
 module Online.View exposing (view)
 
+import Html.App as App
 import Html exposing (Html, div, header, text, i, h4, p, dl, dt, dd, a, ul, li)
 import Html.Attributes exposing (class, classList, href)
 import Dict
@@ -14,6 +15,7 @@ view model =
     let
         discussionEditorView =
             DiscussionEditor.view model.discussionEditorModel
+                |> App.map DiscussionEditorMsg
 
         discussionsView =
             List.map discussionCardView model.discussions
@@ -40,8 +42,8 @@ topBar model =
             [ i
                 [ classList
                     [ ( "fa", True )
-                    , ( "fa fa-spinner fa-pulse fa-fw", not model.connected )
-                    , ( "fa fa-wifi", model.connected )
+                    , ( "fa-spinner fa-pulse fa-fw", not model.connected )
+                    , ( "fa fa-2x fa-wifi", model.connected )
                     ]
                 ]
                 []
