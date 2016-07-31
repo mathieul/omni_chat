@@ -21,10 +21,12 @@ update msg model =
 
         DiscussionEditorMsg deMsg ->
             let
-                discussionEditorModel =
+                ( deModel, deCmds ) =
                     DiscussionEditor.update deMsg model.discussionEditorModel
             in
-                { model | discussionEditorModel = discussionEditorModel } ! []
+                ( { model | discussionEditorModel = deModel }
+                , Cmd.map DiscussionEditorMsg deCmds
+                )
 
         DidJoinChannel ->
             { model | connected = True } ! []
