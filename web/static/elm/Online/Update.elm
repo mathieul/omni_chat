@@ -12,7 +12,7 @@ import Components.DiscussionEditor as DiscussionEditor
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case Debug.log "update:" msg of
+    case msg of
         InitApplication content ->
             doInitApplication content model
 
