@@ -9,8 +9,10 @@ module Components.DiscussionEditor
         )
 
 import Html exposing (Html, text, div, a, i, h4, button, form, input)
-import Html.Attributes exposing (class, href, type', placeholder, autofocus)
-import Html.Events exposing (onClick, onInput)
+import Html.Attributes exposing (class, href, type', placeholder, autofocus, required)
+import Html.Events exposing (onClick, onInput, onSubmit)
+import String
+import String.Extra
 
 
 type alias Model =
@@ -50,13 +52,23 @@ update msg model =
             ( { model | subject = subject }, Cmd.none, Nothing )
 
         CreateDiscussion subject ->
-            ( { model
-                | subject = ""
-                , editing = False
-              }
-            , Cmd.none
-            , Just (DiscussionCreationRequested subject)
-            )
+            let
+                cleanSubject =
+                    subject
+                        |> String.trim
+                        |> String.toLower
+                        |> String.Extra.capitalize True
+            in
+                if String.isEmpty cleanSubject then
+                    ( model, Cmd.none, Nothing )
+                else
+                    ( { model
+                        | subject = ""
+                        , editing = False
+                      }
+                    , Cmd.none
+                    , Just (DiscussionCreationRequested subject)
+                    )
 
 
 view : Model -> Html Msg
@@ -92,34 +104,34 @@ formView : Model -> Html Msg
 formView model =
     div [ class "card" ]
         [ div [ class "card-block text-xs-center" ]
-            [ form []
+            [ form [ onSubmit <| CreateDiscussion model.subject ]
                 [ div [ class "form-group" ]
                     [ input
                         [ type' "text"
                         , class "form-control card-title"
                         , placeholder "Enter subject..."
+                        , required True
                         , autofocus True
                         , onInput UpdateSubject
                         ]
                         []
                     ]
-                ]
-            , div [ class "row" ]
-                [ div [ class "col-xs-6" ]
-                    [ button
-                        [ type' "button"
-                        , class "btn btn-lg btn-primary btn-block col-xs-5"
-                        , onClick <| CreateDiscussion model.subject
+                , div [ class "row" ]
+                    [ div [ class "col-xs-6" ]
+                        [ button
+                            [ type' "submit"
+                            , class "btn btn-lg btn-primary btn-block col-xs-5"
+                            ]
+                            [ text "Create" ]
                         ]
-                        [ text "Create" ]
-                    ]
-                , div [ class "col-xs-6" ]
-                    [ button
-                        [ type' "button"
-                        , class "btn btn-lg btn-secondary btn-block col-xs-5 offset-xs-1"
-                        , onClick StopEditing
+                    , div [ class "col-xs-6" ]
+                        [ button
+                            [ type' "button"
+                            , class "btn btn-lg btn-secondary btn-block col-xs-5 offset-xs-1"
+                            , onClick StopEditing
+                            ]
+                            [ text "Cancel" ]
                         ]
-                        [ text "Cancel" ]
                     ]
                 ]
             ]

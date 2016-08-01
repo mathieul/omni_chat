@@ -57,10 +57,14 @@ interpretOutMsg outmsg model =
     case outmsg of
         DiscussionEditor.DiscussionCreationRequested subject ->
             let
-                _ =
-                    Debug.log "DEBUG>>> subject =" subject
+                newDiscussion =
+                    Discussion subject [] "creating..."
             in
-                ( model, Cmd.none )
+                ( { model
+                    | discussions = newDiscussion :: model.discussions
+                  }
+                , Cmd.none
+                )
 
 
 doInitApplication : AppConfig -> Model -> ( Model, Cmd Msg )

@@ -53,27 +53,36 @@ topBar model =
 
 discussionCardView : Discussion -> Html Msg
 discussionCardView discussion =
-    div [ class "card" ]
-        [ div [ class "card-block" ]
-            [ h4
-                [ class "card-title text-xs-center" ]
-                [ text discussion.subject ]
-            , div [ class "row m-t-2" ]
-                [ div [ class "col-xs-6" ]
-                    [ ul
-                        [ class "list-group" ]
-                        (List.map participantLine discussion.participants)
-                    ]
-                , div [ class "col-xs-6" ]
-                    [ a
-                        [ href "", class "btn btn-success btn-block" ]
-                        [ text "Join" ]
-                    ]
+    let
+        noParticipants =
+            List.length discussion.participants == 0
+    in
+        div
+            [ classList
+                [ ( "card", True )
+                , ( "card-warning", noParticipants )
                 ]
             ]
-        , div [ class "card-footer text-muted" ]
-            [ text discussion.last_activity_at ]
-        ]
+            [ div [ class "card-block" ]
+                [ h4
+                    [ class "card-title text-xs-center" ]
+                    [ text discussion.subject ]
+                , div [ class "row m-t-2" ]
+                    [ div [ class "col-xs-6" ]
+                        [ ul
+                            [ class "list-group" ]
+                            (List.map participantLine discussion.participants)
+                        ]
+                    , div [ class "col-xs-6" ]
+                        [ a
+                            [ href "", class "btn btn-success btn-block" ]
+                            [ text "Join" ]
+                        ]
+                    ]
+                ]
+            , div [ class "card-footer text-muted" ]
+                [ text discussion.last_activity_at ]
+            ]
 
 
 participantLine : Participant -> Html Msg
