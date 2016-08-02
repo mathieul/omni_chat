@@ -1,4 +1,4 @@
-port module Online.Model exposing (Model, initialModel, subscriptions)
+port module Online.Model exposing (Model, initialModel, subscriptions, hallChannel)
 
 import Dict exposing (Dict)
 import Phoenix.Socket

@@ -3,6 +3,7 @@ module Online.Update exposing (update)
 import Json.Encode as JE
 import Phoenix.Socket
 import Phoenix.Channel
+import Phoenix.Push
 import OutMessage
 import Online.Types exposing (..)
 import Online.Model exposing (Model)
@@ -29,13 +30,6 @@ update msg model =
                 |> OutMessage.mapCmd DiscussionEditorMsg
                 |> OutMessage.evaluateMaybe interpretOutMsg Cmd.none
 
-        -- let
-        --     ( deModel, deCmds ) =
-        --         DiscussionEditor.update deMsg model.discussionEditorModel
-        -- in
-        --     ( { model | discussionEditorModel = deModel }
-        --     , Cmd.map DiscussionEditorMsg deCmds
-        --     )
         DidJoinChannel ->
             { model | connected = True } ! []
 
@@ -59,12 +53,37 @@ interpretOutMsg outmsg model =
             let
                 newDiscussion =
                     Discussion subject [] "creating..."
+
+                ( newModel, commands ) =
+                    doRequestDiscussionCreation newDiscussion model
             in
-                ( { model
+                ( { newModel
                     | discussions = newDiscussion :: model.discussions
                   }
-                , Cmd.none
+                , commands
                 )
+
+
+doRequestDiscussionCreation : Discussion -> Model -> ( Model, Cmd Msg )
+doRequestDiscussionCreation discussion model =
+    let
+        payload =
+            JE.object
+                [ ( "subject", JE.string discussion.subject ) ]
+
+        phxPush =
+            Phoenix.Push.init "create_discussion" Online.Model.hallChannel
+                |> Phoenix.Push.withPayload payload
+
+        ( socket, phxCmd ) =
+            Phoenix.Socket.push phxPush model.socket
+
+        _ =
+            Debug.log "doRequestDiscussionCreation" discussion
+    in
+        ( { model | socket = socket }
+        , Cmd.map PhoenixMsg phxCmd
+        )
 
 
 doInitApplication : AppConfig -> Model -> ( Model, Cmd Msg )
@@ -74,7 +93,7 @@ doInitApplication content model =
             AppConfig content.chatter_id content.nickname
 
         channel =
-            Phoenix.Channel.init "discussion:hall"
+            Phoenix.Channel.init Online.Model.hallChannel
                 |> Phoenix.Channel.withPayload (userParams newConfig)
                 |> Phoenix.Channel.onJoin (always DidJoinChannel)
                 |> Phoenix.Channel.onClose (always DidLeaveChannel)
