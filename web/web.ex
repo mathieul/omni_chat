@@ -49,6 +49,9 @@ defmodule OmniChat.Web do
       # Use all HTML functionality (forms, tags, etc)
       use Phoenix.HTML
 
+      # Serialize to JSON API
+      use JaSerializer.PhoenixView
+
       import OmniChat.Router.Helpers
       import OmniChat.ErrorHelpers
       import OmniChat.Gettext

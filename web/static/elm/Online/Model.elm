@@ -35,10 +35,7 @@ initSocket =
         |> Phoenix.Socket.on "all_discussions" hallChannel ReceiveAllDiscussions
         |> Phoenix.Socket.on "presence_state" hallChannel HandlePresenceState
         |> Phoenix.Socket.on "presence_diff" hallChannel HandlePresenceDiff
-
-
-
--- |> Phoenix.Socket.withDebug
+        |> Phoenix.Socket.withDebug
 
 
 initialModel : Model

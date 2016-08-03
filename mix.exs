@@ -53,7 +53,9 @@ defmodule OmniChat.Mixfile do
       {:phoenix, "~> 1.2.0"},
       {:postgrex, ">= 0.0.0"},
       {:faker, "~> 0.5"},
-      {:poison, "~> 2.0"}
+      {:poison, "~> 2.0"},
+      {:ja_serializer, "~> 0.10.1"},
+      {:timex, "~> 3.0.5"}
     ]
   end
 

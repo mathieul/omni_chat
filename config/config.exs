@@ -28,6 +28,18 @@ config :ex_twilio, account_sid: System.get_env("TWILIO_ACCOUNT_SID"),
 
 config :omni_chat, calling_number: "+15103610074"
 
+# JSON API
+config :phoenix, :format_encoders,
+  "json-api": Poison
+
+config :plug, :mimes, %{
+  "application/vnd.api+json" => ["json-api"]
+}
+
+# config :ja_serializer,
+#   key_format: :underscored
+
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env}.exs"

@@ -9,6 +9,12 @@ defmodule OmniChat.Router do
     plug :put_secure_browser_headers
   end
 
+  pipeline :api do
+    plug :accepts, ["json-api"]
+    plug JaSerializer.ContentTypeNegotiation
+    plug JaSerializer.Deserializer
+  end
+
   scope "/", OmniChat do
     pipe_through :browser
 

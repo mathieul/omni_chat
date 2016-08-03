@@ -6,8 +6,12 @@ import Online.Model exposing (Model)
 import Online.Types exposing (Msg, Discussion, Participant)
 
 
+type alias JsonApiContainer =
+    { data : List AllDiscussionsWrapper }
+
+
 type alias AllDiscussionsWrapper =
-    { discussions : List Discussion }
+    { attributes : Discussion }
 
 
 receiveAll : JE.Value -> Model -> ( Model, Cmd Msg )
@@ -17,8 +21,11 @@ receiveAll raw model =
             let
                 _ =
                     Debug.log "CONTENT: " content
+
+                discussions =
+                    List.map (\item -> item.attributes) content.data
             in
-                { model | discussions = content.discussions } ! []
+                { model | discussions = discussions } ! []
 
         Err error ->
             let
@@ -28,10 +35,16 @@ receiveAll raw model =
                 model ! []
 
 
-collectionDecoder : JD.Decoder AllDiscussionsWrapper
+collectionDecoder : JD.Decoder JsonApiContainer
 collectionDecoder =
+    JD.object1 JsonApiContainer
+        ("data" := JD.list attributesDecoder)
+
+
+attributesDecoder : JD.Decoder AllDiscussionsWrapper
+attributesDecoder =
     JD.object1 AllDiscussionsWrapper
-        ("discussions" := JD.list discussionDecoder)
+        ("attributes" := discussionDecoder)
 
 
 discussionDecoder : JD.Decoder Discussion
@@ -39,7 +52,7 @@ discussionDecoder =
     JD.object3 Discussion
         ("subject" := JD.string)
         ("participants" := JD.list participantDecoder)
-        ("last_activity_at" := JD.string)
+        ("last-activity-at" := JD.string)
 
 
 participantDecoder : JD.Decoder Participant
