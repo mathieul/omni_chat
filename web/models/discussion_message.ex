@@ -14,7 +14,7 @@ defmodule OmniChat.DiscussionMessage do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:content])
-    |> validate_required([:content])
+    |> cast(params, [:content, :chatter_id, :discussion_id])
+    |> validate_required([:content, :chatter_id, :discussion_id])
   end
 end

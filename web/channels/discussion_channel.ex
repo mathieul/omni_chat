@@ -28,6 +28,12 @@ defmodule OmniChat.DiscussionChannel do
   def handle_in("create_discussion", %{"subject" => subject}, socket) do
     changeset = Discussion.changeset(%Discussion{}, %{subject: subject})
     case Repo.insert(changeset) do
+      {:ok, discussion} ->
+        discussion
+        |> Ecto.build_assoc(:discussion_messages,
+                            content: welcome_message(discussion),
+                            chatter_id: socket.assigns.chatter_id)
+        |> Repo.insert!
       {:error, changeset} ->
         error_payload = Phoenix.View.render(OmniChat.ErrorView, "errors.json-api", data: changeset)
         push socket, "error", error_payload
@@ -50,5 +56,9 @@ defmodule OmniChat.DiscussionChannel do
     discussions = Repo.all(Discussion)
     collection_payload = JaSerializer.format(OmniChat.DiscussionSerializer, discussions)
     push socket, "all_discussions", collection_payload
+  end
+
+  defp welcome_message(discussion) do
+    "Hey there. So what about \"#{discussion.subject}\""
   end
 end

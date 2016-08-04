@@ -1,10 +1,12 @@
 defmodule OmniChat.Discussion do
   use OmniChat.Web, :model
+  alias OmniChat.DiscussionMessage
 
   schema "discussions" do
     field :subject, :string
 
-    has_many :discussion_messages, OmniChat.DiscussionMessage
+    has_many :discussion_messages, DiscussionMessage, on_delete: :delete_all
+
     timestamps()
   end
 
