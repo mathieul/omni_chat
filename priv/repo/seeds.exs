@@ -11,7 +11,6 @@
 # and so on) as they will fail if something goes wrong.
 alias OmniChat.Repo
 alias OmniChat.Discussion
-alias OmniChat.DiscussionMessage
 alias OmniChat.Chatter
 
 zhanna =

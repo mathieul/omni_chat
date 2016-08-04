@@ -53,7 +53,7 @@ defmodule OmniChat.DiscussionChannel do
   end
 
   defp push_all_discussions(socket) do
-    discussions = Repo.all(Discussion)
+    discussions = Discussion.fetch_all_with_participants
     collection_payload = JaSerializer.format(OmniChat.DiscussionSerializer, discussions)
     push socket, "all_discussions", collection_payload
   end
