@@ -30,7 +30,8 @@ defmodule OmniChat.Mixfile do
         :phoenix_html,
         :phoenix_pubsub,
         :phoenix,
-        :postgrex
+        :postgrex,
+        :timex
       ]
     ]
   end

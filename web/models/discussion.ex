@@ -49,6 +49,7 @@ defmodule OmniChat.Discussion do
         |> Enum.map(fn [_, _, datetime] -> datetime end)
         |> Enum.sort
         |> List.last
+
       %{discussion | participants: participants, last_activity_at: last_activity_at}
     end)
   end

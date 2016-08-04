@@ -11,6 +11,11 @@ defmodule OmniChat.DiscussionSerializer do
       |> Duration.from_minutes
       |> Timex.format_duration(:humanized)
 
-    last_activity <> " ago"
+    case last_activity do
+      "" ->
+        "just now"
+      time_ago ->
+        "#{time_ago} ago"
+    end
   end
 end
