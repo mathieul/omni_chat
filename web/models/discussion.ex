@@ -1,5 +1,6 @@
 defmodule OmniChat.Discussion do
   use OmniChat.Web, :model
+
   alias OmniChat.DiscussionMessage
   alias OmniChat.Chatter
   alias OmniChat.Repo
@@ -7,6 +8,7 @@ defmodule OmniChat.Discussion do
   schema "discussions" do
     field :subject, :string
     field :participants, {:array, :string}, default: [], virtual: true
+    field :last_activity_at, Timex.Ecto.DateTime, virtual: true
 
     has_many :discussion_messages, DiscussionMessage, on_delete: :delete_all
 
@@ -20,35 +22,34 @@ defmodule OmniChat.Discussion do
     |> unique_constraint(:subject)
   end
 
-  def fetch_participant_nicknames(discussion) do
-    query = from dm in DiscussionMessage,
-      join: c in Chatter, on: c.id == dm.chatter_id,
-      where: dm.discussion_id == ^discussion.id,
-      distinct: c.nickname,
-      select: c.nickname
-    Repo.all query
-  end
-
-  def participant_nicknames_per_discussion(discussions) do
+  def participants_per_discussion(discussions) do
     discussion_ids = Enum.map(discussions, &(&1.id))
 
     from(dm in DiscussionMessage,
       join: c in Chatter, on: c.id == dm.chatter_id,
-      distinct: true,
-      select: {dm.discussion_id, c.nickname},
+      distinct: [dm.discussion_id, c.nickname],
+      select: [dm.discussion_id, c.nickname, dm.inserted_at],
       where: dm.discussion_id in ^discussion_ids)
     |> OmniChat.Repo.all
-    |> Enum.group_by(fn {id, _} -> id end)
+    |> Enum.group_by(&List.first/1)
   end
 
   def fetch_all_with_participants do
     discussions = Repo.all(__MODULE__)
-    participants_per_id = __MODULE__.participant_nicknames_per_discussion(discussions)
+    participants_by_id = __MODULE__.participants_per_discussion(discussions)
     Enum.map(discussions, fn discussion ->
-      participants = participants_per_id[discussion.id] || []
-      participants = Enum.sort(participants)
-      formatted = Enum.map(participants, fn {_, nickname} -> %{nickname: nickname} end)
-      %{discussion | participants: formatted}
+      items = participants_by_id[discussion.id]
+      participants =
+        items
+        |> Enum.map(fn [_, nickname, _] -> nickname end)
+        |> Enum.sort
+        |> Enum.map(fn nickname -> %{nickname: nickname} end)
+      last_activity_at =
+        items
+        |> Enum.map(fn [_, _, datetime] -> datetime end)
+        |> Enum.sort
+        |> List.last
+      %{discussion | participants: participants, last_activity_at: last_activity_at}
     end)
   end
 end
