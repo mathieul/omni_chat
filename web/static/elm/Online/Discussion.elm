@@ -52,7 +52,7 @@ discussionDecoder =
     JD.object3 Discussion
         ("subject" := JD.string)
         ("participants" := JD.list participantDecoder)
-        ("last-activity-at" := JD.string)
+        ("last-activity" := JD.string)
 
 
 participantDecoder : JD.Decoder Participant
