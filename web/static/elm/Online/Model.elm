@@ -4,6 +4,7 @@ import Dict exposing (Dict)
 import Phoenix.Socket
 import Online.Types exposing (..)
 import Components.DiscussionEditor as DiscussionEditor
+import Online.Routing as Routing
 
 
 -- MODEL
@@ -15,6 +16,7 @@ type alias Model =
     , presences : PresenceState
     , discussions : List Discussion
     , config : AppConfig
+    , route : Routing.Route
     , discussionEditorModel : DiscussionEditor.Model
     }
 
@@ -38,13 +40,14 @@ initSocket =
         |> Phoenix.Socket.withDebug
 
 
-initialModel : Model
-initialModel =
+initialModel : Routing.Route -> Model
+initialModel route =
     { socket = initSocket
     , connected = False
     , presences = Dict.empty
     , discussions = []
     , config = AppConfig 0 "n/a"
+    , route = route
     , discussionEditorModel = DiscussionEditor.initialModel
     }
 

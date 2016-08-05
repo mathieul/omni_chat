@@ -49,10 +49,15 @@ type alias PresenceStateMetaValue =
 -- Discussion
 
 
+type alias DiscussionId =
+    Int
+
+
 type alias Discussion =
-    { subject : String
+    { id : DiscussionId
+    , subject : String
     , participants : List Participant
-    , last_activity_at : String
+    , last_activity : String
     }
 
 

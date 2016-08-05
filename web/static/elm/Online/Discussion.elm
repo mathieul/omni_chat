@@ -49,7 +49,8 @@ attributesDecoder =
 
 discussionDecoder : JD.Decoder Discussion
 discussionDecoder =
-    JD.object3 Discussion
+    JD.object4 Discussion
+        ("id" := JD.int)
         ("subject" := JD.string)
         ("participants" := JD.list participantDecoder)
         ("last-activity" := JD.string)

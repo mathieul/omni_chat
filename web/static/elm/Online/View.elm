@@ -81,7 +81,7 @@ discussionCardView discussion =
                     ]
                 ]
             , div [ class "card-footer text-muted" ]
-                [ text discussion.last_activity_at ]
+                [ text discussion.last_activity ]
             ]
 
 

@@ -52,7 +52,11 @@ interpretOutMsg outmsg model =
         DiscussionEditor.DiscussionCreationRequested subject ->
             let
                 newDiscussion =
-                    Discussion subject [] "creating..."
+                    { id = 0
+                    , subject = subject
+                    , participants = []
+                    , last_activity = "loading..."
+                    }
 
                 ( newModel, commands ) =
                     doRequestDiscussionCreation newDiscussion model
