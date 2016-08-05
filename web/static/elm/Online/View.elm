@@ -1,8 +1,9 @@
 module Online.View exposing (view)
 
 import Html.App as App
-import Html exposing (Html, div, header, text, i, h4, p, dl, dt, dd, a, ul, li)
-import Html.Attributes exposing (class, classList, href)
+import Html exposing (Html, div, header, text, i, h4, p, dl, dt, dd, ul, li, button)
+import Html.Attributes exposing (class, classList, type')
+import Html.Events exposing (onClick)
 import Dict
 import String
 import Online.Types exposing (..)
@@ -74,8 +75,11 @@ discussionCardView discussion =
                             (List.map participantLine discussion.participants)
                         ]
                     , div [ class "col-xs-6" ]
-                        [ a
-                            [ href "", class "btn btn-success btn-block" ]
+                        [ button
+                            [ type' "button"
+                            , class "btn btn-success btn-block"
+                            , onClick (ShowDiscussion discussion.id)
+                            ]
                             [ text "Join" ]
                         ]
                     ]

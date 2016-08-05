@@ -24,6 +24,8 @@ type Msg
     | DidLeaveChannel
     | ReceiveAllDiscussions Value
     | DiscussionEditorMsg DiscussionEditor.Msg
+    | ShowDiscussions
+    | ShowDiscussion DiscussionId
 
 
 

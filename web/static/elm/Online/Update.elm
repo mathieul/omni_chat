@@ -1,6 +1,7 @@
 module Online.Update exposing (update)
 
 import Json.Encode as JE
+import Navigation
 import Phoenix.Socket
 import Phoenix.Channel
 import Phoenix.Push
@@ -44,6 +45,12 @@ update msg model =
 
         HandlePresenceDiff raw ->
             (Presence.processPresenceDiff raw model) ! []
+
+        ShowDiscussions ->
+            ( model, Navigation.modifyUrl "#discussions" )
+
+        ShowDiscussion discussionId ->
+            ( model, Navigation.modifyUrl <| "#discussions/" ++ (toString discussionId) )
 
 
 interpretOutMsg : DiscussionEditor.OutMsg -> Model -> ( Model, Cmd Msg )
