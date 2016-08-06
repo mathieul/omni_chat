@@ -12,9 +12,9 @@
   "devDependencies": {
     "babel-brunch": "~6.0.0",
     "bootstrap": "^4.0.0-alpha.2",
-    "brunch": "2.7.4",
+    "brunch": "2.8.2",
     "clean-css-brunch": "~2.0.0",
-    "css-brunch": "~2.0.0",
+    "css-brunch": "~2.6.1",
     "elm-brunch": "^0.7.0",
     "font-awesome": "^4.6.3",
     "javascript-brunch": "~2.0.0",
