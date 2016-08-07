@@ -12,11 +12,11 @@ class OnlineInterface {
 
 function _initApplication(app, config) {
   app.ports.initApplication.send(config)
-  app.ports.scrollLastChildIntoView.subscribe(_scrollLastChildIntoView)
+  app.ports.scrollLastMessageIntoView.subscribe(_scrollLastMessageIntoView)
 }
 
-function _scrollLastChildIntoView(id) {
-  const node = document.getElementById(id)
+function _scrollLastMessageIntoView() {
+  const node = document.getElementById("discussion-messages")
   const lastChild = node && node.children[node.children.length - 1]
 
   if (lastChild) {

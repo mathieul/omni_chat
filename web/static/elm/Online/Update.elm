@@ -52,8 +52,11 @@ update msg model =
         ShowDiscussion discussionId ->
             ( model, Navigation.modifyUrl <| "#discussions/" ++ (toString discussionId) )
 
-        ScrollLastChildIntoView ->
-            ( model, scrollLastChildIntoView "discussion-messages" )
+        Tick time ->
+            model ! [ scrollLastMessageIntoView "nothing" ]
+
+
+port scrollLastMessageIntoView : String -> Cmd msg
 
 
 interpretOutMsg : DiscussionEditor.OutMsg -> Model -> ( Model, Cmd Msg )
@@ -122,11 +125,11 @@ doInitApplication content model =
             | socket = phxSocket
             , config = newConfig
           }
-        , Cmd.batch [ wrappedCommands, scrollLastChildIntoView "discussion-messages" ]
+        , Cmd.batch
+            [ wrappedCommands
+            , scrollLastMessageIntoView "can't port without a param?"
+            ]
         )
-
-
-port scrollLastChildIntoView : String -> Cmd msg
 
 
 doHandlePhoenixMsg : Phoenix.Socket.Msg Msg -> Model -> ( Model, Cmd Msg )

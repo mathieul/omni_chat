@@ -26,7 +26,7 @@ type Msg
     | DiscussionEditorMsg DiscussionEditor.Msg
     | ShowDiscussions
     | ShowDiscussion DiscussionId
-    | ScrollLastChildIntoView
+    | Tick Float
 
 
 

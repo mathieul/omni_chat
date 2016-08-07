@@ -2,6 +2,7 @@ port module Online.Model exposing (Model, initialModel, subscriptions, hallChann
 
 import Dict exposing (Dict)
 import Phoenix.Socket
+import AnimationFrame
 import Online.Types exposing (..)
 import Components.DiscussionEditor as DiscussionEditor
 import Online.Routing as Routing
@@ -61,6 +62,7 @@ subscriptions model =
     Sub.batch
         [ Phoenix.Socket.listen model.socket PhoenixMsg
         , initApplication InitApplication
+        , AnimationFrame.diffs Tick
         ]
 
 
