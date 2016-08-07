@@ -1,8 +1,8 @@
 module Online.View exposing (view)
 
-import Html exposing (Html, div, text, button)
-import Html.Attributes exposing (type', class)
-import Html.Events exposing (onClick)
+import List.Extra
+import Html exposing (Html, div, text, button, header, i)
+import Online.DiscussionListView as DiscussionListView
 import Online.DiscussionView as DiscussionView
 import Online.Types exposing (Msg(..))
 import Online.Model exposing (Model)
@@ -13,17 +13,24 @@ view : Model -> Html Msg
 view model =
     case model.route of
         DiscussionsRoute ->
-            DiscussionView.view model
+            DiscussionListView.view model
 
         DiscussionRoute discussionId ->
-            div [ class "container" ]
-                [ div [] [ text <| "DISCUSSION ROUTE ID=" ++ (toString discussionId) ]
-                , button
-                    [ class "btn btn-alternate"
-                    , onClick ShowDiscussions
-                    ]
-                    [ text "Back to all discussions" ]
-                ]
+            let
+                discussionFromId =
+                    List.Extra.find (\item -> item.id == discussionId) model.discussions
+            in
+                case discussionFromId of
+                    Just discussion ->
+                        DiscussionView.view discussion model
+
+                    Nothing ->
+                        notFoundView
 
         NotFoundRoute ->
-            div [] [ text "NOT FOUND ROUTE" ]
+            notFoundView
+
+
+notFoundView : Html msg
+notFoundView =
+    div [] [ text "NOT FOUND ROUTE" ]

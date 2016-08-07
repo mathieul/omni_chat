@@ -57,7 +57,7 @@ update msg model =
                     subject
                         |> String.trim
                         |> String.toLower
-                        |> String.Extra.capitalize True
+                        |> String.Extra.humanize
             in
                 if String.isEmpty cleanSubject then
                     ( model, Cmd.none, Nothing )
