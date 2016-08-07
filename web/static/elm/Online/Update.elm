@@ -1,4 +1,4 @@
-module Online.Update exposing (update)
+port module Online.Update exposing (update)
 
 import Json.Encode as JE
 import Navigation
@@ -51,6 +51,9 @@ update msg model =
 
         ShowDiscussion discussionId ->
             ( model, Navigation.modifyUrl <| "#discussions/" ++ (toString discussionId) )
+
+        ScrollLastChildIntoView ->
+            ( model, scrollLastChildIntoView "discussion-messages" )
 
 
 interpretOutMsg : DiscussionEditor.OutMsg -> Model -> ( Model, Cmd Msg )
@@ -111,13 +114,19 @@ doInitApplication content model =
 
         ( phxSocket, phxCmd ) =
             Phoenix.Socket.join channel model.socket
+
+        wrappedCommands =
+            Cmd.map PhoenixMsg phxCmd
     in
         ( { model
             | socket = phxSocket
             , config = newConfig
           }
-        , Cmd.map PhoenixMsg phxCmd
+        , Cmd.batch [ wrappedCommands, scrollLastChildIntoView "discussion-messages" ]
         )
+
+
+port scrollLastChildIntoView : String -> Cmd msg
 
 
 doHandlePhoenixMsg : Phoenix.Socket.Msg Msg -> Model -> ( Model, Cmd Msg )

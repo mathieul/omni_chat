@@ -1,15 +1,8 @@
 <%= if @elm_module do %>
   <script>
     (function () {
-      var node = document.getElementById('elm-main')
-      var app = Elm.<%= @elm_module %>.embed(node)
-      setTimeout(function () {
-        <%= @elm_module %>(<%= raw if @elm_app_config, do: Poison.encode!(@elm_app_config), else: "{}" %>)
-      }, 0)
-
-      function Online(params) {
-        app.ports.initApplication.send(params)
-      }
+      var interface = new <%= @elm_module %>Interface()
+      interface.start(<%= raw if @elm_app_config, do: Poison.encode!(@elm_app_config), else: "{}" %>)
     })()
   </script>
 <% end %>

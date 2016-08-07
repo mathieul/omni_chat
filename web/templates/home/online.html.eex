@@ -1,8 +1,1 @@
-<%=
-  # render OmniChat.SharedView, "navbar.html",
-  #          conn: @conn,
-  #          nickname: @chatter.nickname,
-  #          phone_number: @chatter.phone_number
-%>
-
 <div id="elm-main"></div>
