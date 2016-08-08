@@ -3,10 +3,6 @@ module Online.Routing exposing (..)
 import String
 import Navigation
 import UrlParser exposing ((</>))
-
-
--- exposing (..)
-
 import Online.Types exposing (DiscussionId)
 
 

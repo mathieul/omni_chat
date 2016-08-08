@@ -1,26 +1,34 @@
 class OnlineInterface {
   constructor() {
-    const node = document.getElementById('elm-main')
-
-    this.app = Elm.Online.embed(node)
+    this.node = document.getElementById('elm-main')
+    this.app = Elm.Online.embed(this.node)
   }
 
   start(config) {
-    setTimeout(() => _initApplication(this.app, config), 0)
+    this.observerNodesAdded()
+    setTimeout(() => _setupPorts(this.app, config), 0)
+  }
+
+  observerNodesAdded() {
+    const observer = new MutationObserver(mutations => {
+      for (const mutation of mutations) {
+        mutation.addedNodes.forEach(_ensureLastDiscussionMessageIntoView)
+      }
+    })
+
+    observer.observe(this.node, {childList: true, subtree: true})
   }
 }
 
-function _initApplication(app, config) {
+function _setupPorts(app, config) {
   app.ports.initApplication.send(config)
-  app.ports.scrollLastChildIntoView.subscribe(_scrollLastChildIntoView)
 }
 
-function _scrollLastChildIntoView(id) {
-  const node = document.getElementById(id)
-  const lastChild = node && node.children[node.children.length - 1]
+function _ensureLastDiscussionMessageIntoView(node) {
+  const containerId = 'discussion-messages'
 
-  if (lastChild) {
-    lastChild.scrollIntoView()
+  if (node.id === containerId || node.parentNode.id == containerId) {
+    document.body.scrollTop = document.body.scrollHeight
   }
 }
 
