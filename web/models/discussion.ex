@@ -28,9 +28,9 @@ defmodule OmniChat.Discussion do
     from(dm in DiscussionMessage,
       join: c in Chatter, on: c.id == dm.chatter_id,
       distinct: [dm.discussion_id, c.nickname],
-      select: [dm.discussion_id, c.nickname, dm.inserted_at],
+      select: [dm.discussion_id, dm.inserted_at, c.id, c.nickname],
       where: dm.discussion_id in ^discussion_ids)
-    |> OmniChat.Repo.all
+    |> Repo.all
     |> Enum.group_by(&List.first/1)
   end
 
@@ -41,12 +41,11 @@ defmodule OmniChat.Discussion do
       items = participants_by_id[discussion.id]
       participants =
         items
-        |> Enum.map(fn [_, nickname, _] -> nickname end)
-        |> Enum.sort
-        |> Enum.map(fn nickname -> %{nickname: nickname} end)
+        |> Enum.map(fn [_, _, id, nickname] -> %{id: id, nickname: nickname} end)
+        |> Enum.sort_by(fn %{nickname: nickname} -> nickname end)
       last_activity_at =
         items
-        |> Enum.map(fn [_, _, datetime] -> datetime end)
+        |> Enum.map(fn [_, datetime, _, _] -> datetime end)
         |> Enum.sort
         |> List.last
 

@@ -10,6 +10,7 @@ import Online.Types exposing (..)
 import Online.Model exposing (Model)
 import Online.Presence as Presence
 import Online.Discussion as Discussion
+import Online.DiscussionMessage as DiscussionMessage
 import Components.DiscussionEditor as DiscussionEditor
 
 
@@ -40,6 +41,9 @@ update msg model =
         ReceiveAllDiscussions raw ->
             Discussion.receiveAll raw model
 
+        RecieveMessages raw ->
+            DiscussionMessage.receiveCollection raw model
+
         HandlePresenceState raw ->
             (Presence.processPresenceState raw model) ! []
 
@@ -50,9 +54,7 @@ update msg model =
             ( model, Navigation.modifyUrl "#discussions" )
 
         ShowDiscussion discussionId ->
-            ( model
-            , Navigation.modifyUrl <| "#discussions/" ++ (toString discussionId)
-            )
+            doShowDiscussion discussionId model
 
 
 interpretOutMsg : DiscussionEditor.OutMsg -> Model -> ( Model, Cmd Msg )
@@ -90,12 +92,30 @@ doRequestDiscussionCreation discussion model =
 
         ( socket, phxCmd ) =
             Phoenix.Socket.push phxPush model.socket
-
-        _ =
-            Debug.log "doRequestDiscussionCreation" discussion
     in
         ( { model | socket = socket }
         , Cmd.map PhoenixMsg phxCmd
+        )
+
+
+doShowDiscussion : DiscussionId -> Model -> ( Model, Cmd Msg )
+doShowDiscussion discussionId model =
+    let
+        channelName =
+            Online.Model.discussionChannel discussionId
+
+        channel =
+            Phoenix.Channel.init channelName
+                |> Phoenix.Channel.withPayload (userParams model.config)
+
+        ( socket, phxCmd ) =
+            Phoenix.Socket.join channel model.socket
+    in
+        ( model
+        , Cmd.batch
+            [ Navigation.modifyUrl <| "#discussions/" ++ (toString discussionId)
+            , Cmd.map PhoenixMsg phxCmd
+            ]
         )
 
 
@@ -113,15 +133,12 @@ doInitApplication content model =
 
         ( phxSocket, phxCmd ) =
             Phoenix.Socket.join channel model.socket
-
-        wrappedCommands =
-            Cmd.map PhoenixMsg phxCmd
     in
         ( { model
             | socket = phxSocket
             , config = newConfig
           }
-        , wrappedCommands
+        , Cmd.map PhoenixMsg phxCmd
         )
 
 

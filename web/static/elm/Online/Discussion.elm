@@ -3,7 +3,7 @@ module Online.Discussion exposing (receiveAll)
 import Json.Decode as JD exposing ((:=))
 import Json.Encode as JE
 import Online.Model exposing (Model)
-import Online.Types exposing (Msg, Discussion, Participant)
+import Online.Types exposing (Msg, Discussion, Chatter)
 
 
 type alias JsonApiContainer =
@@ -19,9 +19,6 @@ receiveAll raw model =
     case JD.decodeValue collectionDecoder raw of
         Ok content ->
             let
-                _ =
-                    Debug.log "CONTENT: " content
-
                 discussions =
                     List.map (\item -> item.attributes) content.data
             in
@@ -30,7 +27,7 @@ receiveAll raw model =
         Err error ->
             let
                 _ =
-                    Debug.log "ERROR: " error
+                    Debug.log "Discussion Error: " error
             in
                 model ! []
 
@@ -56,7 +53,8 @@ discussionDecoder =
         ("last-activity" := JD.string)
 
 
-participantDecoder : JD.Decoder Participant
+participantDecoder : JD.Decoder Chatter
 participantDecoder =
-    JD.object1 Participant
+    JD.object2 Chatter
+        ("id" := JD.int)
         ("nickname" := JD.string)

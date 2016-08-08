@@ -2,10 +2,14 @@ defmodule OmniChat.DiscussionChannel do
   use OmniChat.Web, :channel
   alias OmniChat.Presence
   alias OmniChat.Discussion
+  alias OmniChat.DiscussionMessage
 
-  def join("discussion:" <> discussion, payload, socket) do
+  def join("discussion:" <> discussion_id, payload, socket) do
     send self, :after_join
-    socket = remember_subscriber_info(socket, payload, discussion: discussion)
+    if discussion_id != "hall" do
+      send self, {:push_messages, discussion_id}
+    end
+    socket = remember_subscriber_info(socket, payload, discussion: discussion_id)
 
     {:ok, socket}
   end
@@ -21,6 +25,14 @@ defmodule OmniChat.DiscussionChannel do
     track_presence(socket)
     push socket, "presence_state", Presence.list(socket)
     push_all_discussions(socket)
+
+    {:noreply, socket}
+  end
+
+  def handle_info({:push_messages, discussion_id}, socket) do
+    messages = DiscussionMessage.fetch_recent_messages(discussion_id)
+    collection_payload = JaSerializer.format(OmniChat.DiscussionMessageSerializer, messages)
+    push socket, "messages", collection_payload
 
     {:noreply, socket}
   end

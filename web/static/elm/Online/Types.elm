@@ -23,6 +23,7 @@ type Msg
     | DidJoinChannel
     | DidLeaveChannel
     | ReceiveAllDiscussions Value
+    | RecieveMessages Value
     | DiscussionEditorMsg DiscussionEditor.Msg
     | ShowDiscussions
     | ShowDiscussion DiscussionId
@@ -58,10 +59,22 @@ type alias DiscussionId =
 type alias Discussion =
     { id : DiscussionId
     , subject : String
-    , participants : List Participant
+    , participants : List Chatter
     , last_activity : String
     }
 
 
-type alias Participant =
-    { nickname : String }
+type alias ChatterId =
+    Int
+
+
+type alias Chatter =
+    { id : ChatterId
+    , nickname : String
+    }
+
+
+type alias DiscussionMessage =
+    { chatter : Chatter
+    , content : String
+    }

@@ -65,6 +65,6 @@ discussionCardView discussion =
             ]
 
 
-participantLine : Participant -> Html Msg
+participantLine : Chatter -> Html Msg
 participantLine participant =
     li [ class "list-group-item" ] [ text participant.nickname ]

@@ -1,4 +1,4 @@
-port module Online.Model exposing (Model, initialModel, subscriptions, hallChannel)
+port module Online.Model exposing (Model, initialModel, subscriptions, hallChannel, discussionChannel)
 
 import Dict exposing (Dict)
 import Phoenix.Socket
@@ -15,6 +15,7 @@ type alias Model =
     , connected : Bool
     , presences : PresenceState
     , discussions : List Discussion
+    , messages : List DiscussionMessage
     , config : AppConfig
     , route : Routing.Route
     , discussionEditorModel : DiscussionEditor.Model
@@ -31,12 +32,18 @@ hallChannel =
     "discussion:hall"
 
 
+discussionChannel : DiscussionId -> String
+discussionChannel discussionId =
+    "discussion:" ++ (toString discussionId)
+
+
 initSocket : Phoenix.Socket.Socket Msg
 initSocket =
     Phoenix.Socket.init socketServer
-        |> Phoenix.Socket.on "all_discussions" hallChannel ReceiveAllDiscussions
         |> Phoenix.Socket.on "presence_state" hallChannel HandlePresenceState
         |> Phoenix.Socket.on "presence_diff" hallChannel HandlePresenceDiff
+        |> Phoenix.Socket.on "all_discussions" hallChannel ReceiveAllDiscussions
+        |> Phoenix.Socket.on "messages" "discussion:15" RecieveMessages
         |> Phoenix.Socket.withDebug
 
 
@@ -46,6 +53,7 @@ initialModel route =
     , connected = False
     , presences = Dict.empty
     , discussions = []
+    , messages = []
     , config = AppConfig 0 "n/a"
     , route = route
     , discussionEditorModel = DiscussionEditor.initialModel
