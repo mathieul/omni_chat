@@ -5,14 +5,14 @@ class OnlineInterface {
   }
 
   start(config) {
-    this.observerNodesAdded()
-    setTimeout(() => _setupPorts(this.app, config), 0)
+    this.observeNodesAdded()
+    setTimeout(() => setupPorts(this.app, config), 0)
   }
 
-  observerNodesAdded() {
-    const observer = new MutationObserver(mutations => {
+  observeNodesAdded() {
+    const observer = new MutationObserver(function (mutations) {
       for (const mutation of mutations) {
-        mutation.addedNodes.forEach(_ensureLastDiscussionMessageIntoView)
+        mutation.addedNodes.forEach(scrollSoLastDiscussionMessageIsVisible)
       }
     })
 
@@ -20,11 +20,11 @@ class OnlineInterface {
   }
 }
 
-function _setupPorts(app, config) {
+function setupPorts(app, config) {
   app.ports.initApplication.send(config)
 }
 
-function _ensureLastDiscussionMessageIntoView(node) {
+function scrollSoLastDiscussionMessageIsVisible(node) {
   const containerId = 'discussion-messages'
 
   if (node.id === containerId || node.parentNode.id == containerId) {
