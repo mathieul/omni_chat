@@ -3,7 +3,7 @@ module Online.TopBarView exposing (view)
 import String.Extra
 import Json.Decode as Json
 import Html exposing (Html, div, header, text, i, a, nav)
-import Html.Attributes exposing (class, classList, href, style)
+import Html.Attributes exposing (class, classList, href)
 import Html.Events exposing (onWithOptions, defaultOptions)
 import Online.Types exposing (Msg)
 import Online.Model exposing (Model)
@@ -51,8 +51,7 @@ onClickPreventDefault msg =
 titleView : String -> Html Msg
 titleView title =
     nav
-        [ class "navbar-nav text-xs-center pull-xs-left lead"
-        , style [ ( "width", "68%" ), ( "margin", "0 3%" ) ]
+        [ class "navbar-nav text-xs-center pull-xs-left title-view"
         ]
         [ title |> String.Extra.ellipsis 20 |> text ]
 
@@ -64,7 +63,7 @@ iconView connected =
             [ classList
                 [ ( "fa", True )
                 , ( "fa-spinner fa-pulse fa-fw", not connected )
-                , ( "fa fa-2x fa-wifi", connected )
+                , ( "fa fa-wifi", connected )
                 ]
             ]
             []
