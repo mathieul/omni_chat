@@ -15,10 +15,11 @@ function _initApplication(app, config) {
   app.ports.scrollLastMessageIntoView.subscribe(_scrollLastMessageIntoView)
 }
 
-function _scrollLastMessageIntoView() {
+function _scrollLastMessageIntoView(time) {
   const node = document.getElementById("discussion-messages")
   const lastChild = node && node.children[node.children.length - 1]
 
+  console.log(`_scrollLastMessageIntoView(${time}): node=${node}`)
   if (lastChild) {
     lastChild.scrollIntoView()
   }

@@ -34,4 +34,4 @@ urlUpdate result model =
         currentRoute =
             Routing.routeFromResult result
     in
-        ( { model | route = currentRoute }, Cmd.none )
+        { model | route = currentRoute, scrolled = False } ! []

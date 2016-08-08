@@ -47,16 +47,19 @@ update msg model =
             (Presence.processPresenceDiff raw model) ! []
 
         ShowDiscussions ->
-            ( model, Navigation.modifyUrl "#discussions" )
+            model ! [ Navigation.modifyUrl "#discussions" ]
 
         ShowDiscussion discussionId ->
-            ( model, Navigation.modifyUrl <| "#discussions/" ++ (toString discussionId) )
+            model ! [ Navigation.modifyUrl <| "#discussions/" ++ (toString discussionId) ]
 
         Tick time ->
-            model ! [ scrollLastMessageIntoView "nothing" ]
+            if model.scrolled then
+                model ! []
+            else
+                { model | scrolled = True } ! [ scrollLastMessageIntoView time ]
 
 
-port scrollLastMessageIntoView : String -> Cmd msg
+port scrollLastMessageIntoView : Float -> Cmd msg
 
 
 interpretOutMsg : DiscussionEditor.OutMsg -> Model -> ( Model, Cmd Msg )
@@ -125,10 +128,7 @@ doInitApplication content model =
             | socket = phxSocket
             , config = newConfig
           }
-        , Cmd.batch
-            [ wrappedCommands
-            , scrollLastMessageIntoView "can't port without a param?"
-            ]
+        , wrappedCommands
         )
 
 

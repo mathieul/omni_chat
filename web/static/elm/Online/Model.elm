@@ -19,6 +19,7 @@ type alias Model =
     , config : AppConfig
     , route : Routing.Route
     , discussionEditorModel : DiscussionEditor.Model
+    , scrolled : Bool
     }
 
 
@@ -50,6 +51,7 @@ initialModel route =
     , config = AppConfig 0 "n/a"
     , route = route
     , discussionEditorModel = DiscussionEditor.initialModel
+    , scrolled = False
     }
 
 
