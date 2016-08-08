@@ -14,7 +14,7 @@ body {
 }
 
 #discussion-messages {
-  margin-bottom: 2.5rem;
+  margin-bottom: 3rem;
 }
 
 .navbar-nav i.fa {
@@ -25,4 +25,19 @@ body {
   width: 68%;
   margin: 0.25rem 3% 0 3%;
   font-size: 1.2rem;
+}
+
+.message {
+  padding: .5rem .8rem;
+  margin-bottom: $spacer-y;
+  border: $alert-border-width solid transparent;
+  @include border-radius(1rem);
+}
+
+.message.mine {
+  @include alert-variant($alert-info-bg, $alert-info-border, $alert-info-text);
+}
+
+.message.theirs {
+  @include alert-variant($alert-warning-bg, $alert-warning-border, $alert-warning-text);
 }
