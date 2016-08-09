@@ -1,9 +1,44 @@
-module Online.DiscussionMessage exposing (receiveCollection)
+module Online.DiscussionMessage exposing (receiveCollection, receiveStuff)
 
+import JsonApi.Documents
+import JsonApi.Decode
+import JsonApi.Resources
 import Json.Decode as JD exposing ((:=))
 import Json.Encode as JE
 import Online.Model exposing (Model)
 import Online.Types exposing (Msg, DiscussionMessage, Chatter)
+
+
+receiveStuff : JE.Value -> Model -> ( Model, Cmd Msg )
+receiveStuff raw model =
+    case JD.decodeValue JsonApi.Decode.document raw of
+        Ok document ->
+            let
+                processed =
+                    case JsonApi.Documents.primaryResourceCollection document of
+                        Ok resourceList ->
+                            case List.head resourceList of
+                                Nothing ->
+                                    Debug.crash "Expected non-empty collection"
+
+                                Just resource ->
+                                    case JsonApi.Resources.relatedResource "chatter" resource of
+                                        Ok found ->
+                                            Debug.log "FOUND>>>" (JsonApi.Resources.attributes found)
+
+                                        Err message ->
+                                            Debug.crash message
+
+                        Err message ->
+                            Debug.crash message
+
+                _ =
+                    Debug.log "JsonApi.Document" processed
+            in
+                model ! []
+
+        Err error ->
+            model ! []
 
 
 type alias JsonApiContainer =
