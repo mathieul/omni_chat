@@ -3,13 +3,7 @@ module Online.Routing exposing (..)
 import String
 import Navigation
 import UrlParser exposing ((</>))
-import Online.Types exposing (DiscussionId)
-
-
-type Route
-    = DiscussionListRoute
-    | DiscussionRoute DiscussionId
-    | NotFoundRoute
+import Online.Types exposing (DiscussionId, Route(..))
 
 
 matchers : UrlParser.Parser (Route -> a) a

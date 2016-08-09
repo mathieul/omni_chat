@@ -4,7 +4,6 @@ import Html exposing (Html, div, text, form, input, button, strong)
 import Html.Attributes exposing (class, type', style, id)
 import Html.Events exposing (onSubmit)
 import Online.Types exposing (..)
-import Online.Model exposing (Model)
 import Online.TopBarView as TopBarView
 
 

@@ -7,8 +7,7 @@ import JsonApi
 import JsonApi.Documents
 import JsonApi.Decode
 import JsonApi.Resources
-import Online.Model exposing (Model)
-import Online.Types exposing (Msg, DiscussionMessage, Chatter)
+import Online.Types exposing (Model, Msg, DiscussionMessage, Chatter)
 
 
 receiveCollection : JE.Value -> Model -> ( Model, Cmd Msg )

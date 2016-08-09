@@ -1,11 +1,11 @@
 module Online exposing (..)
 
 import Navigation
-import Online.Types exposing (Msg)
-import Online.Model exposing (Model, initialModel, subscriptions)
+import Online.Types exposing (Model, Msg, Route)
+import Online.Model exposing (initialModel, subscriptions)
 import Online.Update exposing (update)
 import Online.View exposing (view)
-import Online.Routing as Routing exposing (Route)
+import Online.Routing as Routing
 
 
 main : Program Never

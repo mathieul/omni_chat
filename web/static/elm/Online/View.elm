@@ -4,9 +4,7 @@ import List.Extra
 import Html exposing (Html, div, text, button, header, i)
 import Online.DiscussionListView as DiscussionListView
 import Online.DiscussionView as DiscussionView
-import Online.Types exposing (Msg(..))
-import Online.Model exposing (Model)
-import Online.Routing as Routing exposing (Route(..))
+import Online.Types exposing (Model, Msg(..), Route(..))
 
 
 view : Model -> Html Msg

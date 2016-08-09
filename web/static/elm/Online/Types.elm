@@ -6,6 +6,33 @@ import Json.Encode exposing (Value)
 import Components.DiscussionEditor as DiscussionEditor
 
 
+-- Model
+
+
+type alias Model =
+    { socket : Phoenix.Socket.Socket Msg
+    , connected : Bool
+    , presences : PresenceState
+    , discussions : List Discussion
+    , discussionId : Maybe DiscussionId
+    , messages : List DiscussionMessage
+    , config : AppConfig
+    , route : Route
+    , discussionEditorModel : DiscussionEditor.Model
+    }
+
+
+
+-- Route
+
+
+type Route
+    = DiscussionListRoute
+    | DiscussionRoute DiscussionId
+    | NotFoundRoute
+
+
+
 -- Update
 
 

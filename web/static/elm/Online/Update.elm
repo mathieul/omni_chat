@@ -7,7 +7,7 @@ import Phoenix.Channel
 import Phoenix.Push
 import OutMessage
 import Online.Types exposing (..)
-import Online.Model exposing (Model)
+import Online.Backend as Backend
 import Online.Presence as Presence
 import Online.Discussion as Discussion
 import Online.DiscussionMessage as DiscussionMessage
@@ -21,7 +21,7 @@ update msg model =
             doInitApplication content model
 
         PhoenixMsg phxMsg ->
-            doHandlePhoenixMsg phxMsg model
+            Backend.doHandlePhoenixMsg phxMsg model
 
         DiscussionEditorMsg deMsg ->
             DiscussionEditor.update deMsg model.discussionEditorModel
@@ -87,7 +87,7 @@ doRequestDiscussionCreation discussion model =
                 [ ( "subject", JE.string discussion.subject ) ]
 
         phxPush =
-            Phoenix.Push.init "create_discussion" Online.Model.hallChannel
+            Phoenix.Push.init "create_discussion" Backend.hallChannel
                 |> Phoenix.Push.withPayload payload
 
         ( socket, phxCmd ) =
@@ -108,7 +108,7 @@ doShowDiscussionList model =
             Just discussionId ->
                 let
                     ( phxSocket, phxCmd ) =
-                        leaveDiscussionChannel discussionId model.socket
+                        Backend.leaveDiscussionChannel discussionId model.socket
                 in
                     ( { model
                         | socket = phxSocket
@@ -124,26 +124,11 @@ doShowDiscussionList model =
                 model ! [ modifyUrlCmd ]
 
 
-leaveDiscussionChannel :
-    DiscussionId
-    -> Phoenix.Socket.Socket Msg
-    -> ( Phoenix.Socket.Socket Msg, Cmd (Phoenix.Socket.Msg Msg) )
-leaveDiscussionChannel discussionId socket =
-    let
-        channelName =
-            Online.Model.discussionChannel discussionId
-
-        unsubscribedSocket =
-            Phoenix.Socket.off "messages" channelName socket
-    in
-        Phoenix.Socket.leave channelName unsubscribedSocket
-
-
 doShowDiscussion : DiscussionId -> Model -> ( Model, Cmd Msg )
 doShowDiscussion discussionId model =
     let
         channelName =
-            Online.Model.discussionChannel discussionId
+            Backend.discussionChannel discussionId
 
         subscribedSocket =
             Phoenix.Socket.on "messages" channelName ReceiveMessages model.socket
@@ -173,7 +158,7 @@ doInitApplication content model =
             AppConfig content.chatter_id content.nickname
 
         channel =
-            Phoenix.Channel.init Online.Model.hallChannel
+            Phoenix.Channel.init Backend.hallChannel
                 |> Phoenix.Channel.withPayload (userParams newConfig)
                 |> Phoenix.Channel.onJoin (always DidJoinChannel)
                 |> Phoenix.Channel.onClose (always DidLeaveChannel)
@@ -185,17 +170,6 @@ doInitApplication content model =
             | socket = phxSocket
             , config = newConfig
           }
-        , Cmd.map PhoenixMsg phxCmd
-        )
-
-
-doHandlePhoenixMsg : Phoenix.Socket.Msg Msg -> Model -> ( Model, Cmd Msg )
-doHandlePhoenixMsg phxMsg model =
-    let
-        ( phxSocket, phxCmd ) =
-            Phoenix.Socket.update phxMsg model.socket
-    in
-        ( { model | socket = phxSocket }
         , Cmd.map PhoenixMsg phxCmd
         )
 

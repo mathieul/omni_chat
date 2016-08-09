@@ -2,8 +2,7 @@ module Online.Discussion exposing (receiveAll)
 
 import Json.Decode as JD exposing ((:=))
 import Json.Encode as JE
-import Online.Model exposing (Model)
-import Online.Types exposing (Msg, Discussion, Chatter)
+import Online.Types exposing (Model, Msg, Discussion, Chatter)
 
 
 type alias JsonApiContainer =

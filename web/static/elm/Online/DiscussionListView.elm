@@ -5,7 +5,6 @@ import Html exposing (Html, div, header, text, h4, p, dl, dt, dd, ul, li, button
 import Html.Attributes exposing (class, classList, type')
 import Html.Events exposing (onClick)
 import Online.Types exposing (..)
-import Online.Model exposing (Model)
 import Online.TopBarView as TopBarView
 import Components.DiscussionEditor as DiscussionEditor
 

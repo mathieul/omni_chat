@@ -5,8 +5,7 @@ import Json.Decode as Json
 import Html exposing (Html, div, header, text, i, a, nav)
 import Html.Attributes exposing (class, classList, href)
 import Html.Events exposing (onWithOptions, defaultOptions)
-import Online.Types exposing (Msg)
-import Online.Model exposing (Model)
+import Online.Types exposing (Model, Msg)
 
 
 type alias Config =

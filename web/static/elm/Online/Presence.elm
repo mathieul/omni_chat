@@ -5,12 +5,12 @@ import Json.Decode as JD exposing ((:=))
 import Json.Encode as JE
 import Online.Types
     exposing
-        ( Msg
+        ( Model
+        , Msg
         , PresenceState
         , PresenceStateMetaWrapper
         , PresenceStateMetaValue
         )
-import Online.Model exposing (Model)
 
 
 type alias PresenceDiff =
