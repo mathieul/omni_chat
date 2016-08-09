@@ -7,7 +7,7 @@ import Online.Types exposing (DiscussionId)
 
 
 type Route
-    = DiscussionsRoute
+    = DiscussionListRoute
     | DiscussionRoute DiscussionId
     | NotFoundRoute
 
@@ -15,9 +15,9 @@ type Route
 matchers : UrlParser.Parser (Route -> a) a
 matchers =
     UrlParser.oneOf
-        [ UrlParser.format DiscussionsRoute (UrlParser.s "")
+        [ UrlParser.format DiscussionListRoute (UrlParser.s "")
         , UrlParser.format DiscussionRoute (UrlParser.s "discussions" </> UrlParser.int)
-        , UrlParser.format DiscussionsRoute (UrlParser.s "discussions")
+        , UrlParser.format DiscussionListRoute (UrlParser.s "discussions")
         ]
 
 

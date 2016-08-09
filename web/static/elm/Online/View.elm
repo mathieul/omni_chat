@@ -12,7 +12,7 @@ import Online.Routing as Routing exposing (Route(..))
 view : Model -> Html Msg
 view model =
     case model.route of
-        DiscussionsRoute ->
+        DiscussionListRoute ->
             DiscussionListView.view model
 
         DiscussionRoute discussionId ->
