@@ -15,6 +15,7 @@ type alias Model =
     , connected : Bool
     , presences : PresenceState
     , discussions : List Discussion
+    , discussionId : Maybe DiscussionId
     , messages : List DiscussionMessage
     , config : AppConfig
     , route : Routing.Route
@@ -43,7 +44,6 @@ initSocket =
         |> Phoenix.Socket.on "presence_state" hallChannel HandlePresenceState
         |> Phoenix.Socket.on "presence_diff" hallChannel HandlePresenceDiff
         |> Phoenix.Socket.on "all_discussions" hallChannel ReceiveAllDiscussions
-        |> Phoenix.Socket.on "messages" "discussion:15" RecieveMessages
         |> Phoenix.Socket.withDebug
 
 
@@ -53,6 +53,7 @@ initialModel route =
     , connected = False
     , presences = Dict.empty
     , discussions = []
+    , discussionId = Nothing
     , messages = []
     , config = AppConfig 0 "n/a"
     , route = route

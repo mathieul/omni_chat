@@ -5,23 +5,24 @@ defmodule OmniChat.DiscussionChannel do
   alias OmniChat.DiscussionMessage
 
   def join("discussion:" <> discussion_id, payload, socket) do
-    send self, :after_join
-    if discussion_id != "hall" do
-      send self, {:push_messages, discussion_id}
+    if discussion_id == "hall" do
+      send self, :after_hall_join
+    else
+      send self, {:after_single_join, discussion_id}
     end
-    socket = remember_subscriber_info(socket, payload, discussion: discussion_id)
+    socket = remember_subscriber_info(socket, payload, subtopic: discussion_id)
 
     {:ok, socket}
   end
 
-  def remember_subscriber_info(socket, info, discussion: discussion) do
+  def remember_subscriber_info(socket, info, subtopic: subtopic) do
     socket
     |> assign(:chatter_id, info["chatter_id"])
     |> assign(:nickname, info["nickname"])
-    |> assign(:discussion, discussion)
+    |> assign(:subtopic, subtopic)
   end
 
-  def handle_info(:after_join, socket) do
+  def handle_info(:after_hall_join, socket) do
     track_presence(socket)
     push socket, "presence_state", Presence.list(socket)
     push_all_discussions(socket)
@@ -29,7 +30,7 @@ defmodule OmniChat.DiscussionChannel do
     {:noreply, socket}
   end
 
-  def handle_info({:push_messages, discussion_id}, socket) do
+  def handle_info({:after_single_join, discussion_id}, socket) do
     messages = DiscussionMessage.fetch_recent_messages(discussion_id)
     collection_payload = JaSerializer.format(OmniChat.DiscussionMessageSerializer, messages)
     push socket, "messages", collection_payload

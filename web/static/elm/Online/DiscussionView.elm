@@ -13,7 +13,7 @@ view discussion model =
     div [ class "container with-fixed-top-navbar" ]
         [ TopBarView.view model
             { title = discussion.subject
-            , back = Just ShowDiscussions
+            , back = Just ShowDiscussionsList
             }
         , messages model
         , editor model
@@ -59,7 +59,7 @@ theirMessage nickname content =
 editor : Model -> Html Msg
 editor model =
     div [ class "navbar navbar-fixed-bottom navbar-light bg-faded" ]
-        [ form [ onSubmit ShowDiscussions ]
+        [ form [ onSubmit ShowDiscussionsList ]
             [ div [ class "row" ]
                 [ div [ class "col-xs-8", style [ ( "padding-right", "0" ) ] ]
                     [ input

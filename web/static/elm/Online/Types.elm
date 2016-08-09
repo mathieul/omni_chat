@@ -23,9 +23,9 @@ type Msg
     | DidJoinChannel
     | DidLeaveChannel
     | ReceiveAllDiscussions Value
-    | RecieveMessages Value
+    | ReceiveMessages Value
     | DiscussionEditorMsg DiscussionEditor.Msg
-    | ShowDiscussions
+    | ShowDiscussionsList
     | ShowDiscussion DiscussionId
 
 

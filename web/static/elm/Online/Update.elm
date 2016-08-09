@@ -41,7 +41,7 @@ update msg model =
         ReceiveAllDiscussions raw ->
             Discussion.receiveAll raw model
 
-        RecieveMessages raw ->
+        ReceiveMessages raw ->
             DiscussionMessage.receiveCollection raw model
 
         HandlePresenceState raw ->
@@ -50,8 +50,8 @@ update msg model =
         HandlePresenceDiff raw ->
             (Presence.processPresenceDiff raw model) ! []
 
-        ShowDiscussions ->
-            ( model, Navigation.modifyUrl "#discussions" )
+        ShowDiscussionsList ->
+            doShowDiscussionsList model
 
         ShowDiscussion discussionId ->
             doShowDiscussion discussionId model
@@ -98,20 +98,67 @@ doRequestDiscussionCreation discussion model =
         )
 
 
+doShowDiscussionsList : Model -> ( Model, Cmd Msg )
+doShowDiscussionsList model =
+    let
+        modifyUrlCmd =
+            Navigation.modifyUrl "#discussions"
+    in
+        case model.discussionId of
+            Just discussionId ->
+                let
+                    ( phxSocket, phxCmd ) =
+                        leaveDiscussionChannel discussionId model.socket
+                in
+                    ( { model
+                        | socket = phxSocket
+                        , discussionId = Nothing
+                      }
+                    , Cmd.batch
+                        [ modifyUrlCmd
+                        , Cmd.map PhoenixMsg phxCmd
+                        ]
+                    )
+
+            Nothing ->
+                model ! [ modifyUrlCmd ]
+
+
+leaveDiscussionChannel :
+    DiscussionId
+    -> Phoenix.Socket.Socket Msg
+    -> ( Phoenix.Socket.Socket Msg, Cmd (Phoenix.Socket.Msg Msg) )
+leaveDiscussionChannel discussionId socket =
+    let
+        channelName =
+            Online.Model.discussionChannel discussionId
+
+        unsubscribedSocket =
+            Phoenix.Socket.off "messages" channelName socket
+    in
+        Phoenix.Socket.leave channelName unsubscribedSocket
+
+
 doShowDiscussion : DiscussionId -> Model -> ( Model, Cmd Msg )
 doShowDiscussion discussionId model =
     let
         channelName =
             Online.Model.discussionChannel discussionId
 
+        subscribedSocket =
+            Phoenix.Socket.on "messages" channelName ReceiveMessages model.socket
+
         channel =
             Phoenix.Channel.init channelName
                 |> Phoenix.Channel.withPayload (userParams model.config)
 
-        ( socket, phxCmd ) =
-            Phoenix.Socket.join channel model.socket
+        ( phxSocket, phxCmd ) =
+            Phoenix.Socket.join channel subscribedSocket
     in
-        ( model
+        ( { model
+            | socket = phxSocket
+            , discussionId = Just discussionId
+          }
         , Cmd.batch
             [ Navigation.modifyUrl <| "#discussions/" ++ (toString discussionId)
             , Cmd.map PhoenixMsg phxCmd
