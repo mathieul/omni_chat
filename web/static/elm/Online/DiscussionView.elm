@@ -13,15 +13,15 @@ view discussion model =
     div [ class "container with-fixed-top-navbar" ]
         [ TopBarView.view model
             { title = discussion.subject
-            , back = Just ShowDiscussionsList
+            , back = Just ShowDiscussionList
             }
-        , messages model
+        , messageListView model
         , editor model
         ]
 
 
-messages : Model -> Html Msg
-messages model =
+messageListView : Model -> Html Msg
+messageListView model =
     div [ id "discussion-messages" ]
         (List.map (messageView model.config.chatter_id) model.messages)
 
@@ -59,7 +59,7 @@ theirMessage nickname content =
 editor : Model -> Html Msg
 editor model =
     div [ class "navbar navbar-fixed-bottom navbar-light bg-faded" ]
-        [ form [ onSubmit ShowDiscussionsList ]
+        [ form [ onSubmit ShowDiscussionList ]
             [ div [ class "row" ]
                 [ div [ class "col-xs-8", style [ ( "padding-right", "0" ) ] ]
                     [ input

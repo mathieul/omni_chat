@@ -25,7 +25,7 @@ type Msg
     | ReceiveAllDiscussions Value
     | ReceiveMessages Value
     | DiscussionEditorMsg DiscussionEditor.Msg
-    | ShowDiscussionsList
+    | ShowDiscussionList
     | ShowDiscussion DiscussionId
 
 

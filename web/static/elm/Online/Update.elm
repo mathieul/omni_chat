@@ -50,8 +50,8 @@ update msg model =
         HandlePresenceDiff raw ->
             (Presence.processPresenceDiff raw model) ! []
 
-        ShowDiscussionsList ->
-            doShowDiscussionsList model
+        ShowDiscussionList ->
+            doShowDiscussionList model
 
         ShowDiscussion discussionId ->
             doShowDiscussion discussionId model
@@ -98,8 +98,8 @@ doRequestDiscussionCreation discussion model =
         )
 
 
-doShowDiscussionsList : Model -> ( Model, Cmd Msg )
-doShowDiscussionsList model =
+doShowDiscussionList : Model -> ( Model, Cmd Msg )
+doShowDiscussionList model =
     let
         modifyUrlCmd =
             Navigation.modifyUrl "#discussions"
