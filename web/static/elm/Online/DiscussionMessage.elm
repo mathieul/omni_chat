@@ -1,96 +1,77 @@
-module Online.DiscussionMessage exposing (receiveCollection, receiveStuff)
+module Online.DiscussionMessage exposing (receiveCollection)
 
+import Dict exposing (Dict)
+import Json.Decode as JD
+import Json.Encode as JE
+import JsonApi
 import JsonApi.Documents
 import JsonApi.Decode
 import JsonApi.Resources
-import Json.Decode as JD exposing ((:=))
-import Json.Encode as JE
 import Online.Model exposing (Model)
 import Online.Types exposing (Msg, DiscussionMessage, Chatter)
 
 
-receiveStuff : JE.Value -> Model -> ( Model, Cmd Msg )
-receiveStuff raw model =
-    case JD.decodeValue JsonApi.Decode.document raw of
-        Ok document ->
-            let
-                processed =
-                    case JsonApi.Documents.primaryResourceCollection document of
-                        Ok resourceList ->
-                            case List.head resourceList of
-                                Nothing ->
-                                    Debug.crash "Expected non-empty collection"
-
-                                Just resource ->
-                                    case JsonApi.Resources.relatedResource "chatter" resource of
-                                        Ok found ->
-                                            Debug.log "FOUND>>>" (JsonApi.Resources.attributes found)
-
-                                        Err message ->
-                                            Debug.crash message
-
-                        Err message ->
-                            Debug.crash message
-
-                _ =
-                    Debug.log "JsonApi.Document" processed
-            in
-                model ! []
-
-        Err error ->
-            model ! []
-
-
-type alias JsonApiContainer =
-    { data : List AllMessagesWrapper }
-
-
-type alias AllMessagesWrapper =
-    { attributes : DiscussionMessage }
-
-
 receiveCollection : JE.Value -> Model -> ( Model, Cmd Msg )
 receiveCollection raw model =
-    case JD.decodeValue collectionDecoder raw of
-        Ok content ->
-            let
-                _ =
-                    Debug.log "DiscussionMessage Content: " content
+    { model | messages = extractMessageCollectionFromJson raw } ! []
 
-                messages =
-                    List.map (\item -> item.attributes) content.data
-            in
-                { model | messages = messages } ! []
+
+extractMessageCollectionFromJson : JE.Value -> List DiscussionMessage
+extractMessageCollectionFromJson raw =
+    case JD.decodeValue JsonApi.Decode.document raw of
+        Ok document ->
+            extractMessageCollectionFromDocument document
 
         Err error ->
-            let
-                _ =
-                    Debug.log "DiscussionMessage Error: " error
-            in
-                model ! []
+            Debug.crash error
 
 
-collectionDecoder : JD.Decoder JsonApiContainer
-collectionDecoder =
-    JD.object1 JsonApiContainer
-        ("data" := JD.list attributesDecoder)
+extractMessageCollectionFromDocument : JsonApi.Document -> List DiscussionMessage
+extractMessageCollectionFromDocument document =
+    case JsonApi.Documents.primaryResourceCollection document of
+        Ok resourceList ->
+            List.map extractMessageFromResource resourceList
+
+        Err error ->
+            Debug.crash error
 
 
-attributesDecoder : JD.Decoder AllMessagesWrapper
-attributesDecoder =
-    JD.object1 AllMessagesWrapper
-        ("attributes" := discussionDecoder)
+extractMessageFromResource : JsonApi.Resource -> DiscussionMessage
+extractMessageFromResource messageResource =
+    let
+        attributes =
+            JsonApi.Resources.attributes messageResource
+    in
+        { chatter = extractChatterAsRelatedResource messageResource
+        , content = getStringAttribute "content" attributes
+        }
 
 
-discussionDecoder : JD.Decoder DiscussionMessage
-discussionDecoder =
-    JD.object2 DiscussionMessage
-        ("chatter" := chatterDecoder)
-        ("content" := JD.string)
+extractChatterAsRelatedResource : JsonApi.Resource -> Chatter
+extractChatterAsRelatedResource messageResource =
+    let
+        attributes =
+            case JsonApi.Resources.relatedResource "chatter" messageResource of
+                Ok chatter ->
+                    JsonApi.Resources.attributes chatter
+
+                Err error ->
+                    Debug.crash error
+    in
+        { id = getIntAttribute "id" attributes
+        , nickname = getStringAttribute "nickname" attributes
+        }
 
 
-chatterDecoder : JD.Decoder Chatter
-chatterDecoder =
-    JD.object2 Chatter
-        ("id" := JD.int)
-        ("nickname" := JD.string)
+getStringAttribute : String -> Dict String JD.Value -> String
+getStringAttribute key dict =
+    Dict.get key dict
+        `Maybe.andThen` (JD.decodeValue JD.string >> Result.toMaybe)
+        |> Maybe.withDefault "???"
+
+
+getIntAttribute : String -> Dict String JD.Value -> Int
+getIntAttribute key dict =
+    Dict.get key dict
+        `Maybe.andThen` (JD.decodeValue JD.int >> Result.toMaybe)
+        |> Maybe.withDefault 0

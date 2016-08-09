@@ -42,9 +42,8 @@ update msg model =
             Discussion.receiveAll raw model
 
         ReceiveMessages raw ->
-            DiscussionMessage.receiveStuff raw model
+            DiscussionMessage.receiveCollection raw model
 
-        -- DiscussionMessage.receiveCollection raw model
         HandlePresenceState raw ->
             (Presence.processPresenceState raw model) ! []
 

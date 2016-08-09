@@ -10,7 +10,7 @@ import Components.DiscussionEditor as DiscussionEditor
 
 
 type alias AppConfig =
-    { chatter_id : Int
+    { chatter_id : ChatterId
     , nickname : String
     }
 

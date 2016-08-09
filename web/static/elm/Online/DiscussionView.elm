@@ -23,15 +23,15 @@ view discussion model =
 messages : Model -> Html Msg
 messages model =
     div [ id "discussion-messages" ]
-        [ myMessage "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor"
-        , theirMessage "fifi" "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-        , theirMessage "fifi" "sunt in culpa qui officia deserunt mollit anim id est laborum."
-        , theirMessage "zhannulia" "cupidatat non proident"
-        , myMessage "Esse cillum dolore eu fugiat nulla pariatur."
-        , myMessage "Ok..."
-        , theirMessage "riri" "I don't want to!"
-        , myMessage "I figured"
-        ]
+        (List.map (messageView model.config.chatter_id) model.messages)
+
+
+messageView : ChatterId -> DiscussionMessage -> Html Msg
+messageView chatterId message =
+    if message.chatter.id == chatterId then
+        myMessage message.content
+    else
+        theirMessage message.chatter.nickname message.content
 
 
 myMessage : String -> Html Msg
