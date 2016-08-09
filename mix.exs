@@ -57,7 +57,8 @@ defmodule OmniChat.Mixfile do
       {:poison, "~> 2.0"},
       {:ja_serializer, "~> 0.10.1"},
       {:timex, "~> 3.0.5"},
-      {:timex_ecto, "~> 3.0.3"}
+      {:timex_ecto, "~> 3.0.3"},
+      {:apex, "~>0.5.1"}
     ]
   end
 

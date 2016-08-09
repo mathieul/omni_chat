@@ -33,6 +33,7 @@ defmodule OmniChat.DiscussionChannel do
   def handle_info({:after_single_join, discussion_id}, socket) do
     messages = DiscussionMessage.fetch_recent_messages(discussion_id)
     collection_payload = JaSerializer.format(OmniChat.DiscussionMessageSerializer, messages)
+    Apex.ap {:messages, collection_payload}
     push socket, "messages", collection_payload
 
     {:noreply, socket}
