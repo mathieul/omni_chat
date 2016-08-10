@@ -4,23 +4,20 @@ defmodule OmniChat.DiscussionChannel do
   alias OmniChat.Discussion
   alias OmniChat.DiscussionMessage
   alias OmniChat.DiscussionMessageSerializer
+  alias OmniChat.Subscription
 
-  def join("discussion:" <> discussion_id, payload, socket) do
-    if discussion_id == "hall" do
-      send self, :after_hall_join
-    else
-      send self, {:after_single_join, discussion_id}
-    end
-    socket = remember_subscriber_info(socket, payload, subtopic: discussion_id)
+  def join("discussion:hall", payload, socket) do
+    send self, :after_hall_join
+    socket = remember_subscriber_info(socket, payload, discussion_id: nil)
 
     {:ok, socket}
   end
 
-  def remember_subscriber_info(socket, info, subtopic: subtopic) do
-    socket
-    |> assign(:chatter_id, info["chatter_id"])
-    |> assign(:nickname, info["nickname"])
-    |> assign(:subtopic, subtopic)
+  def join("discussion:" <> discussion_id, payload, socket) do
+    send self, {:after_single_join, discussion_id}
+    socket = remember_subscriber_info(socket, payload, discussion_id: discussion_id)
+
+    {:ok, socket}
   end
 
   def handle_info(:after_hall_join, socket) do
@@ -32,6 +29,7 @@ defmodule OmniChat.DiscussionChannel do
   end
 
   def handle_info({:after_single_join, discussion_id}, socket) do
+    subscribe_to_discussion(socket)
     messages = DiscussionMessage.fetch_recent_messages(discussion_id)
     collection_payload = JaSerializer.format(DiscussionMessageSerializer, messages)
     push socket, "messages", collection_payload
@@ -49,8 +47,7 @@ defmodule OmniChat.DiscussionChannel do
                             chatter_id: socket.assigns.chatter_id)
         |> Repo.insert!
       {:error, changeset} ->
-        error_payload = Phoenix.View.render(OmniChat.ErrorView, "errors.json-api", data: changeset)
-        push socket, "error", error_payload
+        push_changeset_errors(changeset, socket)
       _ ->
       nil
     end
@@ -60,7 +57,7 @@ defmodule OmniChat.DiscussionChannel do
   end
 
   def handle_in("send_message", %{"content" => content}, socket) do
-    discussion = Repo.get(Discussion, socket.assigns.subtopic)
+    discussion = Repo.get(Discussion, socket.assigns.discussion_id)
     message =
       discussion
       |> Ecto.build_assoc(:discussion_messages,
@@ -72,6 +69,22 @@ defmodule OmniChat.DiscussionChannel do
     broadcast socket, "message", JaSerializer.format(DiscussionMessageSerializer, message)
 
     {:noreply, socket}
+  end
+
+  def terminate({:shutdown, :left}, socket) do
+    unsubscribe_from_discussion(socket)
+  end
+
+  defp push_changeset_errors(changeset, socket) do
+    error_payload = Phoenix.View.render(OmniChat.ErrorView, "errors.json-api", data: changeset)
+    push socket, "error", error_payload
+  end
+
+  defp remember_subscriber_info(socket, info, discussion_id: discussion_id) do
+    socket
+    |> assign(:chatter_id, info["chatter_id"])
+    |> assign(:nickname, info["nickname"])
+    |> assign(:discussion_id, discussion_id)
   end
 
   defp track_presence(socket) do
@@ -93,5 +106,26 @@ defmodule OmniChat.DiscussionChannel do
 
   defp welcome_message(discussion) do
     "Hey there. So what about \"#{discussion.subject}\""
+  end
+
+  defp subscribe_to_discussion(socket) do
+    params = Map.take(socket.assigns, [:chatter_id, :discussion_id])
+    changeset = Subscription.changeset(%Subscription{}, params)
+    case Repo.insert(changeset) do
+      {:ok, _} ->
+        nil
+      {:error, changeset} ->
+        push_changeset_errors(changeset, socket)
+      _ ->
+      nil
+    end
+  end
+
+  defp unsubscribe_from_discussion(socket) do
+    Map.take(socket.assigns, [:chatter_id, :discussion_id])
+    |> Subscription.by_chatter_and_discussion
+    |> Repo.delete_all
+
+    {:noreply, socket}
   end
 end
