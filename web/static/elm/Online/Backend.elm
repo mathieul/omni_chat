@@ -5,10 +5,16 @@ module Online.Backend
         , initSocket
         , leaveDiscussionChannel
         , doHandlePhoenixMsg
+        , requestDiscussionCreation
+        , doJoinDiscussionChannel
+        , doJoinDiscussionHallChannel
         )
 
-import Phoenix.Socket
-import Online.Types exposing (Msg(..), DiscussionId, Model)
+import Json.Encode as JE
+import Phoenix.Socket exposing (Socket)
+import Phoenix.Channel
+import Phoenix.Push
+import Online.Types exposing (Model, Msg(..), DiscussionId, AppConfig)
 
 
 socketServer : String
@@ -26,7 +32,7 @@ discussionChannel discussionId =
     "discussion:" ++ (toString discussionId)
 
 
-initSocket : Phoenix.Socket.Socket Msg
+initSocket : Socket Msg
 initSocket =
     Phoenix.Socket.init socketServer
         |> Phoenix.Socket.on "presence_state" hallChannel HandlePresenceState
@@ -37,8 +43,8 @@ initSocket =
 
 leaveDiscussionChannel :
     DiscussionId
-    -> Phoenix.Socket.Socket Msg
-    -> ( Phoenix.Socket.Socket Msg, Cmd (Phoenix.Socket.Msg Msg) )
+    -> Socket Msg
+    -> ( Socket Msg, Cmd (Phoenix.Socket.Msg Msg) )
 leaveDiscussionChannel discussionId socket =
     let
         channelName =
@@ -59,3 +65,53 @@ doHandlePhoenixMsg phxMsg model =
         ( { model | socket = phxSocket }
         , Cmd.map PhoenixMsg phxCmd
         )
+
+
+requestDiscussionCreation : String -> Socket Msg -> ( Socket Msg, Cmd (Phoenix.Socket.Msg Msg) )
+requestDiscussionCreation subject socket =
+    let
+        payload =
+            JE.object
+                [ ( "subject", JE.string subject ) ]
+
+        phxPush =
+            Phoenix.Push.init "create_discussion" hallChannel
+                |> Phoenix.Push.withPayload payload
+    in
+        Phoenix.Socket.push phxPush socket
+
+
+doJoinDiscussionChannel : DiscussionId -> AppConfig -> Socket Msg -> ( Socket Msg, Cmd (Phoenix.Socket.Msg Msg) )
+doJoinDiscussionChannel discussionId config socket =
+    let
+        channelName =
+            discussionChannel discussionId
+
+        subscribedSocket =
+            Phoenix.Socket.on "messages" channelName ReceiveMessages socket
+
+        channel =
+            Phoenix.Channel.init channelName
+                |> Phoenix.Channel.withPayload (userParams config)
+    in
+        Phoenix.Socket.join channel subscribedSocket
+
+
+doJoinDiscussionHallChannel : AppConfig -> Socket Msg -> ( Socket Msg, Cmd (Phoenix.Socket.Msg Msg) )
+doJoinDiscussionHallChannel config socket =
+    let
+        channel =
+            Phoenix.Channel.init hallChannel
+                |> Phoenix.Channel.withPayload (userParams config)
+                |> Phoenix.Channel.onJoin (always DidJoinChannel)
+                |> Phoenix.Channel.onClose (always DidLeaveChannel)
+    in
+        Phoenix.Socket.join channel socket
+
+
+userParams : AppConfig -> JE.Value
+userParams config =
+    JE.object
+        [ ( "chatter_id", JE.int config.chatter_id )
+        , ( "nickname", JE.string config.nickname )
+        ]

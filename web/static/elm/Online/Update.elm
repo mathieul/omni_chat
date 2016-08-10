@@ -2,9 +2,6 @@ module Online.Update exposing (update)
 
 import Json.Encode as JE
 import Navigation
-import Phoenix.Socket
-import Phoenix.Channel
-import Phoenix.Push
 import OutMessage
 import Online.Types exposing (..)
 import Online.Backend as Backend
@@ -82,18 +79,10 @@ interpretOutMsg outmsg model =
 doRequestDiscussionCreation : Discussion -> Model -> ( Model, Cmd Msg )
 doRequestDiscussionCreation discussion model =
     let
-        payload =
-            JE.object
-                [ ( "subject", JE.string discussion.subject ) ]
-
-        phxPush =
-            Phoenix.Push.init "create_discussion" Backend.hallChannel
-                |> Phoenix.Push.withPayload payload
-
-        ( socket, phxCmd ) =
-            Phoenix.Socket.push phxPush model.socket
+        ( pxhSocket, phxCmd ) =
+            Backend.requestDiscussionCreation discussion.subject model.socket
     in
-        ( { model | socket = socket }
+        ( { model | socket = pxhSocket }
         , Cmd.map PhoenixMsg phxCmd
         )
 
@@ -127,18 +116,8 @@ doShowDiscussionList model =
 doShowDiscussion : DiscussionId -> Model -> ( Model, Cmd Msg )
 doShowDiscussion discussionId model =
     let
-        channelName =
-            Backend.discussionChannel discussionId
-
-        subscribedSocket =
-            Phoenix.Socket.on "messages" channelName ReceiveMessages model.socket
-
-        channel =
-            Phoenix.Channel.init channelName
-                |> Phoenix.Channel.withPayload (userParams model.config)
-
         ( phxSocket, phxCmd ) =
-            Phoenix.Socket.join channel subscribedSocket
+            Backend.doJoinDiscussionChannel discussionId model.config model.socket
     in
         ( { model
             | socket = phxSocket
@@ -157,26 +136,23 @@ doInitApplication content model =
         newConfig =
             AppConfig content.chatter_id content.nickname
 
-        channel =
-            Phoenix.Channel.init Backend.hallChannel
-                |> Phoenix.Channel.withPayload (userParams newConfig)
-                |> Phoenix.Channel.onJoin (always DidJoinChannel)
-                |> Phoenix.Channel.onClose (always DidLeaveChannel)
-
         ( phxSocket, phxCmd ) =
-            Phoenix.Socket.join channel model.socket
+            Backend.doJoinDiscussionHallChannel newConfig model.socket
+
+        ( phxSocket', phxCmd' ) =
+            case model.route of
+                DiscussionRoute discussionId ->
+                    Backend.doJoinDiscussionChannel discussionId newConfig phxSocket
+
+                _ ->
+                    ( phxSocket, Cmd.none )
     in
         ( { model
-            | socket = phxSocket
+            | socket = phxSocket'
             , config = newConfig
           }
-        , Cmd.map PhoenixMsg phxCmd
+        , Cmd.batch
+            [ Cmd.map PhoenixMsg phxCmd
+            , Cmd.map PhoenixMsg phxCmd'
+            ]
         )
-
-
-userParams : AppConfig -> JE.Value
-userParams config =
-    JE.object
-        [ ( "chatter_id", JE.int config.chatter_id )
-        , ( "nickname", JE.string config.nickname )
-        ]
