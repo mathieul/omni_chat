@@ -73,6 +73,11 @@ defmodule OmniChat.DiscussionChannel do
 
   def terminate({:shutdown, :left}, socket) do
     unsubscribe_from_discussion(socket)
+    :ok
+  end
+
+  def terminate(_, _) do
+    :ok
   end
 
   defp push_changeset_errors(changeset, socket) do
@@ -112,8 +117,6 @@ defmodule OmniChat.DiscussionChannel do
     params = Map.take(socket.assigns, [:chatter_id, :discussion_id])
     changeset = Subscription.changeset(%Subscription{}, params)
     case Repo.insert(changeset) do
-      {:ok, _} ->
-        nil
       {:error, changeset} ->
         push_changeset_errors(changeset, socket)
       _ ->
