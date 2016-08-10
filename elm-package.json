@@ -18,6 +18,7 @@
         "evancz/url-parser": "1.0.0 <= v < 2.0.0",
         "fbonetti/elm-phoenix-socket": "2.0.0 <= v < 3.0.0",
         "folkertdev/outmessage": "1.0.2 <= v < 2.0.0",
+        "jasonmahr/html-escape-sequences": "2.0.5 <= v < 3.0.0",
 
         "NoRedInk/elm-decode-pipeline": "1.1.2 <= v < 2.0.0",
         "elm-community/json-extra": "1.0.0 <= v < 2.0.0"

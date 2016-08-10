@@ -9,7 +9,7 @@ module Components.DiscussionEditor
         )
 
 import Html exposing (Html, text, div, a, i, h4, button, form, input)
-import Html.Attributes exposing (class, href, type', placeholder, autofocus, required)
+import Html.Attributes exposing (class, href, type', placeholder, autofocus, required, style)
 import Html.Events exposing (onClick, onInput, onSubmit)
 import String
 import String.Extra
@@ -83,20 +83,26 @@ view model =
 
 choiceView : Html Msg
 choiceView =
-    div [ class "card" ]
+    div [ class "card card-inverse card-warning" ]
         [ div [ class "card-block text-xs-center" ]
-            [ h4
-                [ class "card-title text-muted" ]
-                [ text "New Discussion" ]
-            , button
-                [ type' "button"
-                , class "btn btn-lg btn-primary m-y-1"
-                , onClick StartEditing
+            [ div [ class "row" ]
+                [ div [ class "col-xs-8" ]
+                    [ h4
+                        [ class "card-title"
+                        , style [ ( "margin-top", "1.5rem" ) ]
+                        ]
+                        [ text "New Discussion" ]
+                    ]
+                , div [ class "col-xs-4" ]
+                    [ button
+                        [ type' "button"
+                        , class "btn btn-lg btn-primary m-y-1"
+                        , onClick StartEditing
+                        ]
+                        [ i [ class "fa fa-plus" ] [] ]
+                    ]
                 ]
-                [ i [ class "fa fa-plus" ] [] ]
             ]
-        , div [ class "card-footer text-muted" ]
-            [ text "start new discussion" ]
         ]
 
 

@@ -5,6 +5,7 @@ import Json.Decode as Json
 import Html exposing (Html, div, header, text, i, a, nav)
 import Html.Attributes exposing (class, classList, href)
 import Html.Events exposing (onWithOptions, defaultOptions)
+import Unicode
 import Online.Types exposing (Model, Msg)
 
 
@@ -34,12 +35,12 @@ backView back =
                     , class "nav-item nav-link active"
                     , onClickPreventDefault msg
                     ]
-                    [ text "< Back" ]
+                    [ text "< Leave" ]
                 ]
 
         Nothing ->
-            nav [ class "col-xs-4" ]
-                []
+            nav [ class "navbar-nav pull-xs-left" ]
+                [ Unicode.text' "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" ]
 
 
 onClickPreventDefault : msg -> Html.Attribute msg

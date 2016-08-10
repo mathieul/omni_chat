@@ -44,26 +44,23 @@ discussionCardView discussion =
                     [ class "card-title text-xs-center" ]
                     [ text discussion.subject ]
                 , div [ class "row m-t-2" ]
-                    [ div [ class "col-xs-6" ]
-                        [ ul
-                            [ class "list-group" ]
-                            (List.map participantLine discussion.participants)
-                        ]
-                    , div [ class "col-xs-6" ]
+                    [ div [ class "col-xs-5" ]
+                        [ ul [] (List.map participantLine discussion.participants) ]
+                    , div [ class "col-xs-7" ]
                         [ button
                             [ type' "button"
                             , class "btn btn-success btn-block"
                             , onClick (ShowDiscussion discussion.id)
                             ]
-                            [ text "Join" ]
+                            [ text "Join Discussion" ]
                         ]
                     ]
                 ]
             , div [ class "card-footer text-muted" ]
-                [ text discussion.last_activity ]
+                [ text <| "latest message " ++ discussion.last_activity ]
             ]
 
 
 participantLine : Chatter -> Html Msg
 participantLine participant =
-    li [ class "list-group-item" ] [ text participant.nickname ]
+    li [] [ text participant.nickname ]
