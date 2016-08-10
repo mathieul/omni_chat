@@ -50,7 +50,9 @@ type Msg
     | DidJoinChannel
     | DidLeaveChannel
     | ReceiveAllDiscussions Value
-    | ReceiveMessages Value
+    | ReceiveMessageList Value
+    | ReceiveMessage Value
+    | SendMessage DiscussionMessage
     | DiscussionEditorMsg DiscussionEditor.Msg
     | ShowDiscussionList
     | ShowDiscussion DiscussionId

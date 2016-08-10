@@ -1,4 +1,4 @@
-module Online.DiscussionMessage exposing (receiveCollection)
+module Online.DiscussionMessage exposing (receiveCollection, receiveOne)
 
 import Dict exposing (Dict)
 import Json.Decode as JD
@@ -13,6 +13,15 @@ import Online.Types exposing (Model, Msg, DiscussionMessage, Chatter)
 receiveCollection : JE.Value -> Model -> ( Model, Cmd Msg )
 receiveCollection raw model =
     { model | messages = extractMessageCollectionFromJson raw } ! []
+
+
+receiveOne : JE.Value -> Model -> ( Model, Cmd Msg )
+receiveOne raw model =
+    let
+        message =
+            extractMessageFromJson raw
+    in
+        { model | messages = message :: model.messages } ! []
 
 
 extractMessageCollectionFromJson : JE.Value -> List DiscussionMessage
@@ -30,6 +39,26 @@ extractMessageCollectionFromDocument document =
     case JsonApi.Documents.primaryResourceCollection document of
         Ok resourceList ->
             List.map extractMessageFromResource resourceList
+
+        Err error ->
+            Debug.crash error
+
+
+extractMessageFromJson : JE.Value -> DiscussionMessage
+extractMessageFromJson raw =
+    case JD.decodeValue JsonApi.Decode.document raw of
+        Ok document ->
+            extractMessageFromDocument document
+
+        Err error ->
+            Debug.crash error
+
+
+extractMessageFromDocument : JsonApi.Document -> DiscussionMessage
+extractMessageFromDocument document =
+    case JsonApi.Documents.primaryResource document of
+        Ok resource ->
+            extractMessageFromResource resource
 
         Err error ->
             Debug.crash error

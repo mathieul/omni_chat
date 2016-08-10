@@ -38,8 +38,14 @@ update msg model =
         ReceiveAllDiscussions raw ->
             Discussion.receiveAll raw model
 
-        ReceiveMessages raw ->
+        ReceiveMessageList raw ->
             DiscussionMessage.receiveCollection raw model
+
+        ReceiveMessage raw ->
+            DiscussionMessage.receiveOne raw model
+
+        SendMessage message ->
+            model ! []
 
         HandlePresenceState raw ->
             (Presence.processPresenceState raw model) ! []
