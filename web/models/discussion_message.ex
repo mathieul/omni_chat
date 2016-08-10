@@ -1,6 +1,8 @@
 defmodule OmniChat.DiscussionMessage do
   use OmniChat.Web, :model
 
+  @max_number_messages_fetched 50
+
   schema "discussion_messages" do
     field :content, :string
 
@@ -20,7 +22,7 @@ defmodule OmniChat.DiscussionMessage do
       preload: [:chatter],
       where: dm.discussion_id == ^discussion_id,
       order_by: [desc: dm.inserted_at],
-      limit: 10)
+      limit: @max_number_messages_fetched)
       |> OmniChat.Repo.all
       |> Enum.reverse
   end

@@ -18,10 +18,10 @@ receiveCollection raw model =
 receiveOne : JE.Value -> Model -> ( Model, Cmd Msg )
 receiveOne raw model =
     let
-        message =
-            extractMessageFromJson raw
+        messages =
+            List.append model.messages [ extractMessageFromJson raw ]
     in
-        { model | messages = message :: model.messages } ! []
+        { model | messages = messages } ! []
 
 
 extractMessageCollectionFromJson : JE.Value -> List DiscussionMessage
