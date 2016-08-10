@@ -26,4 +26,8 @@ defmodule OmniChat.DiscussionMessage do
       |> OmniChat.Repo.all
       |> Enum.reverse
   end
+
+  def max_messages do
+    @max_number_messages_fetched
+  end
 end

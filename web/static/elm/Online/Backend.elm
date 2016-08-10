@@ -39,7 +39,10 @@ initSocket =
         |> Phoenix.Socket.on "presence_state" hallChannel HandlePresenceState
         |> Phoenix.Socket.on "presence_diff" hallChannel HandlePresenceDiff
         |> Phoenix.Socket.on "all_discussions" hallChannel ReceiveAllDiscussions
-        |> Phoenix.Socket.withDebug
+
+
+
+-- |> Phoenix.Socket.withDebug
 
 
 leaveDiscussionChannel :

@@ -154,7 +154,7 @@ doInitApplication : AppConfig -> Model -> ( Model, Cmd Msg )
 doInitApplication content model =
     let
         newConfig =
-            AppConfig content.chatter_id content.nickname
+            AppConfig content.chatter_id content.nickname content.max_messages
 
         ( phxSocket, phxCmd ) =
             Backend.doJoinDiscussionHallChannel newConfig model.socket

@@ -16,7 +16,8 @@ defmodule OmniChat.HomeController do
       chatter ->
         elm_app_config = %{
           "chatter_id" => chatter.id,
-          "nickname" => chatter.nickname
+          "nickname" => chatter.nickname,
+          "max_messages" => OmniChat.DiscussionMessage.max_messages
         }
         render conn, "online.html", chatter: chatter,
                                     elm_module: "Online",

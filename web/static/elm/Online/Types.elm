@@ -40,6 +40,7 @@ type Route
 type alias AppConfig =
     { chatter_id : ChatterId
     , nickname : String
+    , max_messages : Int
     }
 
 

@@ -19,7 +19,11 @@ receiveOne : JE.Value -> Model -> ( Model, Cmd Msg )
 receiveOne raw model =
     let
         messages =
-            List.append model.messages [ extractMessageFromJson raw ]
+            model.messages
+                |> List.reverse
+                |> List.take (model.config.max_messages - 1)
+                |> (::) (extractMessageFromJson raw)
+                |> List.reverse
     in
         { model | messages = messages } ! []
 
