@@ -55,6 +55,7 @@ initialModel route =
     , config = AppConfig 0 "n/a"
     , route = route
     , discussionEditorModel = DiscussionEditor.initialModel
+    , currentMessage = ""
     }
 
 

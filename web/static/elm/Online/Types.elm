@@ -19,6 +19,7 @@ type alias Model =
     , config : AppConfig
     , route : Route
     , discussionEditorModel : DiscussionEditor.Model
+    , currentMessage : String
     }
 
 
@@ -52,7 +53,7 @@ type Msg
     | ReceiveAllDiscussions Value
     | ReceiveMessageList Value
     | ReceiveMessage Value
-    | SendMessage DiscussionMessage
+    | SendMessage
     | DiscussionEditorMsg DiscussionEditor.Msg
     | ShowDiscussionList
     | ShowDiscussion DiscussionId

@@ -44,8 +44,19 @@ update msg model =
         ReceiveMessage raw ->
             DiscussionMessage.receiveOne raw model
 
-        SendMessage message ->
-            model ! []
+        SendMessage ->
+            let
+                discussionId =
+                    Maybe.withDefault 0 model.discussionId
+
+                ( phxSocket, phxCmd ) =
+                    Backend.doSendMessage model.currentMessage discussionId model.socket
+            in
+                { model
+                    | socket = phxSocket
+                    , currentMessage = ""
+                }
+                    ! [ Cmd.map PhoenixMsg phxCmd ]
 
         HandlePresenceState raw ->
             (Presence.processPresenceState raw model) ! []
@@ -86,7 +97,7 @@ doRequestDiscussionCreation : Discussion -> Model -> ( Model, Cmd Msg )
 doRequestDiscussionCreation discussion model =
     let
         ( pxhSocket, phxCmd ) =
-            Backend.requestDiscussionCreation discussion.subject model.socket
+            Backend.doCreateDiscussion discussion.subject model.socket
     in
         ( { model | socket = pxhSocket }
         , Cmd.map PhoenixMsg phxCmd

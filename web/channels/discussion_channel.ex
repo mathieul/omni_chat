@@ -59,6 +59,10 @@ defmodule OmniChat.DiscussionChannel do
     {:noreply, socket}
   end
 
+  def handle_in("send_message", %{"content" => content}, socket) do
+    {:noreply, socket}
+  end
+
   defp track_presence(socket) do
     {:ok, _ } = Presence.track(socket, socket.assigns.chatter_id, %{
       online_at: inspect(System.system_time(:seconds)),

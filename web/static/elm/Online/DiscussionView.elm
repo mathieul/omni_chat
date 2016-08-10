@@ -1,7 +1,7 @@
 module Online.DiscussionView exposing (view)
 
 import Html exposing (Html, div, text, form, input, button, strong)
-import Html.Attributes exposing (class, type', style, id)
+import Html.Attributes exposing (class, type', style, id, value, autofocus)
 import Html.Events exposing (onSubmit)
 import Online.Types exposing (..)
 import Online.TopBarView as TopBarView
@@ -58,12 +58,14 @@ theirMessage nickname content =
 editor : Model -> Html Msg
 editor model =
     div [ class "navbar navbar-fixed-bottom navbar-light bg-faded" ]
-        [ form [ onSubmit ShowDiscussionList ]
+        [ form [ onSubmit (SendMessage) ]
             [ div [ class "row" ]
                 [ div [ class "col-xs-8", style [ ( "padding-right", "0" ) ] ]
                     [ input
                         [ type' "text"
                         , class "form-control"
+                        , value model.currentMessage
+                        , autofocus True
                         ]
                         []
                     ]

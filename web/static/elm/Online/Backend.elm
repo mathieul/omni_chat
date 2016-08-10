@@ -5,9 +5,10 @@ module Online.Backend
         , initSocket
         , leaveDiscussionChannel
         , doHandlePhoenixMsg
-        , requestDiscussionCreation
+        , doCreateDiscussion
         , doJoinDiscussionChannel
         , doJoinDiscussionHallChannel
+        , doSendMessage
         )
 
 import Json.Encode as JE
@@ -67,8 +68,8 @@ doHandlePhoenixMsg phxMsg model =
         )
 
 
-requestDiscussionCreation : String -> Socket Msg -> ( Socket Msg, Cmd (Phoenix.Socket.Msg Msg) )
-requestDiscussionCreation subject socket =
+doCreateDiscussion : String -> Socket Msg -> ( Socket Msg, Cmd (Phoenix.Socket.Msg Msg) )
+doCreateDiscussion subject socket =
     let
         payload =
             JE.object
@@ -115,3 +116,20 @@ userParams config =
         [ ( "chatter_id", JE.int config.chatter_id )
         , ( "nickname", JE.string config.nickname )
         ]
+
+
+doSendMessage : String -> DiscussionId -> Socket Msg -> ( Socket Msg, Cmd (Phoenix.Socket.Msg Msg) )
+doSendMessage content discussionId socket =
+    let
+        channelName =
+            discussionChannel discussionId
+
+        payload =
+            JE.object
+                [ ( "content", JE.string content ) ]
+
+        phxPush =
+            Phoenix.Push.init "send_message" channelName
+                |> Phoenix.Push.withPayload payload
+    in
+        Phoenix.Socket.push phxPush socket
