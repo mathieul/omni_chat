@@ -66,7 +66,7 @@ defmodule OmniChat.DiscussionChannel do
       |> Repo.insert!
       |> Repo.preload(:chatter)
 
-    broadcast socket, "message", JaSerializer.format(DiscussionMessageSerializer, message)
+    propagate_message(message, socket)
 
     {:noreply, socket}
   end
@@ -130,5 +130,10 @@ defmodule OmniChat.DiscussionChannel do
     |> Repo.delete_all
 
     {:noreply, socket}
+  end
+
+  defp propagate_message(message, socket) do
+    broadcast socket, "message", JaSerializer.format(DiscussionMessageSerializer, message)
+    # TODO: send SMS to all chatters subscribed who are not present and not the message chatter
   end
 end
