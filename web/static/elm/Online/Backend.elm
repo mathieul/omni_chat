@@ -89,7 +89,9 @@ doJoinDiscussionChannel discussionId config socket =
             discussionChannel discussionId
 
         subscribedSocket =
-            Phoenix.Socket.on "messages" channelName ReceiveMessageList socket
+            socket
+                |> Phoenix.Socket.on "messages" channelName ReceiveMessageList
+                |> Phoenix.Socket.on "message" channelName ReceiveMessage
 
         channel =
             Phoenix.Channel.init channelName

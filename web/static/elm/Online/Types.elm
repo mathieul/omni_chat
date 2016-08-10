@@ -53,6 +53,7 @@ type Msg
     | ReceiveAllDiscussions Value
     | ReceiveMessageList Value
     | ReceiveMessage Value
+    | UpdateCurrentMessage String
     | SendMessage
     | DiscussionEditorMsg DiscussionEditor.Msg
     | ShowDiscussionList

@@ -3,6 +3,7 @@ defmodule OmniChat.DiscussionChannel do
   alias OmniChat.Presence
   alias OmniChat.Discussion
   alias OmniChat.DiscussionMessage
+  alias OmniChat.DiscussionMessageSerializer
 
   def join("discussion:" <> discussion_id, payload, socket) do
     if discussion_id == "hall" do
@@ -32,8 +33,8 @@ defmodule OmniChat.DiscussionChannel do
 
   def handle_info({:after_single_join, discussion_id}, socket) do
     messages = DiscussionMessage.fetch_recent_messages(discussion_id)
-    collection_payload = JaSerializer.format(OmniChat.DiscussionMessageSerializer, messages)
-    Apex.ap {:messages, collection_payload}
+    collection_payload = JaSerializer.format(DiscussionMessageSerializer, messages)
+    # Apex.ap {:messages, collection_payload}
     push socket, "messages", collection_payload
 
     {:noreply, socket}
@@ -60,6 +61,19 @@ defmodule OmniChat.DiscussionChannel do
   end
 
   def handle_in("send_message", %{"content" => content}, socket) do
+    Apex.ap {"send_message", :content, content, :subtopic, socket.assigns.subtopic}
+    discussion = Repo.get(Discussion, socket.assigns.subtopic)
+    Apex.ap {:debug, :discusssion, discussion}
+    message =
+      discussion
+      |> Ecto.build_assoc(:discussion_messages,
+                          content: content,
+                          chatter_id: socket.assigns.chatter_id)
+      |> Repo.insert!
+      |> Repo.preload(:chatter)
+
+    broadcast socket, "message", JaSerializer.format(DiscussionMessageSerializer, message)
+
     {:noreply, socket}
   end
 

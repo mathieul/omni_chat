@@ -44,6 +44,9 @@ update msg model =
         ReceiveMessage raw ->
             DiscussionMessage.receiveOne raw model
 
+        UpdateCurrentMessage content ->
+            { model | currentMessage = content } ! []
+
         SendMessage ->
             let
                 discussionId =
@@ -156,17 +159,26 @@ doInitApplication content model =
         ( phxSocket, phxCmd ) =
             Backend.doJoinDiscussionHallChannel newConfig model.socket
 
-        ( phxSocket', phxCmd' ) =
+        maybeDiscussionId =
             case model.route of
                 DiscussionRoute discussionId ->
-                    Backend.doJoinDiscussionChannel discussionId newConfig phxSocket
+                    Just discussionId
 
                 _ ->
+                    Nothing
+
+        ( phxSocket', phxCmd' ) =
+            case maybeDiscussionId of
+                Just discussionId ->
+                    Backend.doJoinDiscussionChannel discussionId newConfig phxSocket
+
+                Nothing ->
                     ( phxSocket, Cmd.none )
     in
         ( { model
             | socket = phxSocket'
             , config = newConfig
+            , discussionId = maybeDiscussionId
           }
         , Cmd.batch
             [ Cmd.map PhoenixMsg phxCmd

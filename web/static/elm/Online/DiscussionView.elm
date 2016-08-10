@@ -2,7 +2,7 @@ module Online.DiscussionView exposing (view)
 
 import Html exposing (Html, div, text, form, input, button, strong)
 import Html.Attributes exposing (class, type', style, id, value, autofocus)
-import Html.Events exposing (onSubmit)
+import Html.Events exposing (onSubmit, onInput)
 import Online.Types exposing (..)
 import Online.TopBarView as TopBarView
 
@@ -66,6 +66,7 @@ editor model =
                         , class "form-control"
                         , value model.currentMessage
                         , autofocus True
+                        , onInput UpdateCurrentMessage
                         ]
                         []
                     ]
