@@ -14,8 +14,8 @@ import Components.DiscussionEditor as DiscussionEditor
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        InitApplication content ->
-            doInitApplication content model
+        InitApplication config ->
+            doInitApplication config model
 
         PhoenixMsg phxMsg ->
             Backend.doHandlePhoenixMsg phxMsg model
@@ -151,37 +151,46 @@ doShowDiscussion discussionId model =
 
 
 doInitApplication : AppConfig -> Model -> ( Model, Cmd Msg )
-doInitApplication content model =
+doInitApplication config model =
     let
-        newConfig =
-            AppConfig content.chatter_id content.nickname content.max_messages
-
         ( phxSocket, phxCmd ) =
-            Backend.doJoinDiscussionHallChannel newConfig model.socket
+            Backend.doJoinDiscussionHallChannel config model.socket
+
+        maybeRedirect =
+            case config.discussion_id of
+                Just discussionId ->
+                    Navigation.modifyUrl <| "#discussions/" ++ (toString discussionId)
+
+                Nothing ->
+                    Cmd.none
 
         maybeDiscussionId =
-            case model.route of
-                DiscussionRoute discussionId ->
-                    Just discussionId
+            if config.discussion_id == Nothing then
+                case model.route of
+                    DiscussionRoute discussionId ->
+                        Just discussionId
 
-                _ ->
-                    Nothing
+                    _ ->
+                        Nothing
+            else
+                config.discussion_id
 
         ( phxSocket', phxCmd' ) =
             case maybeDiscussionId of
                 Just discussionId ->
-                    Backend.doJoinDiscussionChannel discussionId newConfig phxSocket
+                    Backend.doJoinDiscussionChannel discussionId config phxSocket
 
                 Nothing ->
                     ( phxSocket, Cmd.none )
     in
         ( { model
             | socket = phxSocket'
-            , config = newConfig
+            , config = config
             , discussionId = maybeDiscussionId
           }
         , Cmd.batch
             [ Cmd.map PhoenixMsg phxCmd
             , Cmd.map PhoenixMsg phxCmd'
+            , maybeRedirect
             ]
         )

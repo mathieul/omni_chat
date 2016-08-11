@@ -6,7 +6,9 @@ defmodule OmniChat.DiscussionChannel do
   alias OmniChat.DiscussionMessageSerializer
   alias OmniChat.Subscription
 
-  def join("discussion:hall", payload, socket) do
+  @hall "discussion:hall"
+
+  def join(@hall, payload, socket) do
     send self, :after_hall_join
     socket = remember_subscriber_info(socket, payload, discussion_id: nil)
 
@@ -136,7 +138,7 @@ defmodule OmniChat.DiscussionChannel do
     broadcast socket, "message", JaSerializer.format(DiscussionMessageSerializer, message)
 
     chatter_ids =
-      Presence.list("discussion:hall")
+      Presence.list(@hall)
       |> Map.keys
       |> Enum.map(&String.to_integer/1)
       |> Enum.concat([socket.assigns.chatter_id])
