@@ -5,8 +5,7 @@
     "license": "BSD3",
     "source-directories": [
         ".",
-        "web/static/elm",
-        "../../Vendor/elm-jsonapi/src"
+        "web/static/elm"
     ],
     "exposed-modules": [],
     "dependencies": {
@@ -18,9 +17,7 @@
         "evancz/url-parser": "1.0.0 <= v < 2.0.0",
         "fbonetti/elm-phoenix-socket": "2.0.0 <= v < 3.0.0",
         "folkertdev/outmessage": "1.0.2 <= v < 2.0.0",
-
-        "NoRedInk/elm-decode-pipeline": "1.1.2 <= v < 2.0.0",
-        "elm-community/json-extra": "1.0.0 <= v < 2.0.0"
+        "noahzgordon/elm-jsonapi": "1.0.1 <= v < 2.0.0"
     },
     "elm-version": "0.17.1 <= v < 0.18.0"
 }
