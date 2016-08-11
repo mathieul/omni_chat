@@ -126,7 +126,7 @@ defmodule OmniChat.DiscussionChannel do
 
   defp unsubscribe_from_discussion(socket) do
     Map.take(socket.assigns, [:chatter_id, :discussion_id])
-    |> Subscription.by_chatter_and_discussion
+    |> Subscription.find_by_discussion_and_chatter
     |> Repo.delete_all
 
     {:noreply, socket}
@@ -134,6 +134,24 @@ defmodule OmniChat.DiscussionChannel do
 
   defp propagate_message(message, socket) do
     broadcast socket, "message", JaSerializer.format(DiscussionMessageSerializer, message)
-    # TODO: send SMS to all chatters subscribed who are not present and not the message chatter
+
+    chatter_ids =
+      Presence.list("discussion:hall")
+      |> Map.keys
+      |> Enum.map(&String.to_integer/1)
+      |> Enum.concat([socket.assigns.chatter_id])
+      |> Enum.uniq
+
+    %{discussion_id: socket.assigns.discussion_id, chatter_ids: chatter_ids}
+    |> Subscription.find_by_discussion_not_those_chatters
+    |> Repo.all
+    |> Repo.preload(:chatter)
+    |> Enum.map(&(&1.chatter))
+    |> Enum.uniq
+    |> Enum.each(fn chatter -> send_text_message(chatter, message) end)
+  end
+
+  defp send_text_message(chatter, message) do
+    OmniChat.Messaging.send_message(chatter.phone_number, message.content)
   end
 end

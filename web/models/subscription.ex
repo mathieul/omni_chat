@@ -14,9 +14,13 @@ defmodule OmniChat.Subscription do
     |> validate_required([:discussion_id, :chatter_id])
   end
 
-  def by_chatter_and_discussion(%{chatter_id: chatter_id, discussion_id: discussion_id}) do
+  def find_by_discussion_and_chatter(%{discussion_id: discussion_id, chatter_id: chatter_id}) do
     from s in __MODULE__,
-      where: s.chatter_id == ^chatter_id,
-      where: s.discussion_id == ^discussion_id
+      where: [discussion_id: ^discussion_id, chatter_id: ^chatter_id]
+  end
+
+  def find_by_discussion_not_those_chatters(%{discussion_id: discussion_id, chatter_ids: chatter_ids}) do
+    from s in __MODULE__,
+    where: s.discussion_id == ^discussion_id and not s.chatter_id in ^chatter_ids
   end
 end
