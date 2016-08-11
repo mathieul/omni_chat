@@ -4,7 +4,7 @@ defmodule OmniChat.Mixfile do
   def project do
     [
       app: :omni_chat,
-      version: "0.0.1",
+      version: "0.1.0",
       elixir: "~> 1.2",
       elixirc_paths: elixirc_paths(Mix.env),
       compilers: [:phoenix, :gettext] ++ Mix.compilers,
@@ -20,17 +20,20 @@ defmodule OmniChat.Mixfile do
     [
       mod: {OmniChat, []},
       applications: [
+        :apex,
         :cowboy,
         :ex_twilio,
         :ex_twiml,
         :faker,
         :gettext,
+        :ja_serializer,
         :logger,
         :phoenix_ecto,
         :phoenix_html,
         :phoenix_pubsub,
         :phoenix,
         :postgrex,
+        :timex_ecto,
         :timex
       ]
     ]
@@ -59,7 +62,7 @@ defmodule OmniChat.Mixfile do
       {:timex, "~> 3.0.5"},
       {:timex_ecto, "~> 3.0.3"},
       {:apex, "~>0.5.1"},
-      {:exrm, "~> 0.18.1"}
+      {:exrm, "~> 1.0.8"}
     ]
   end
 
