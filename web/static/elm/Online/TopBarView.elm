@@ -5,7 +5,6 @@ import Json.Decode as Json
 import Html exposing (Html, div, header, text, i, a, nav)
 import Html.Attributes exposing (class, classList, href)
 import Html.Events exposing (onWithOptions, defaultOptions)
-import Unicode
 import Online.Types exposing (Model, Msg)
 
 
@@ -19,9 +18,12 @@ view : Model -> Config -> Html Msg
 view model config =
     header
         [ class "navbar navbar-fixed-top navbar-dark bg-primary" ]
-        [ backView config.back
-        , titleView config.title
-        , iconView model.connected
+        [ div
+            [ class "row" ]
+            [ backView config.back
+            , titleView config.title
+            , iconView model.connected
+            ]
         ]
 
 
@@ -45,7 +47,7 @@ backView back =
                         ]
                         [ text "Exit" ]
     in
-        nav [ class "navbar-nav pull-xs-left" ]
+        nav [ class "navbar-nav col-xs-3" ]
             [ link ]
 
 
@@ -57,14 +59,13 @@ onClickPreventDefault msg =
 titleView : String -> Html Msg
 titleView title =
     nav
-        [ class "navbar-nav text-xs-center pull-xs-left title-view"
-        ]
-        [ title |> String.Extra.ellipsis 20 |> text ]
+        [ class "navbar-nav text-xs-center col-xs-7 title-view" ]
+        [ text title ]
 
 
 iconView : Bool -> Html Msg
 iconView connected =
-    nav [ class "navbar-nav pull-xs-right" ]
+    nav [ class "navbar-nav text-xs-right col-xs-2" ]
         [ i
             [ classList
                 [ ( "fa", True )
