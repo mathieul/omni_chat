@@ -27,20 +27,26 @@ view model config =
 
 backView : Maybe Msg -> Html Msg
 backView back =
-    case back of
-        Just msg ->
-            nav [ class "navbar-nav pull-xs-left" ]
-                [ a
-                    [ href ""
-                    , class "nav-item nav-link active"
-                    , onClickPreventDefault msg
-                    ]
-                    [ text "< Leave" ]
-                ]
+    let
+        link =
+            case back of
+                Just msg ->
+                    a
+                        [ href ""
+                        , class "nav-item nav-link active"
+                        , onClickPreventDefault msg
+                        ]
+                        [ text "< Leave" ]
 
-        Nothing ->
-            nav [ class "navbar-nav pull-xs-left" ]
-                [ Unicode.text' "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" ]
+                Nothing ->
+                    a
+                        [ href "/sign-out"
+                        , class "nav-item nav-link active"
+                        ]
+                        [ text "Exit" ]
+    in
+        nav [ class "navbar-nav pull-xs-left" ]
+            [ link ]
 
 
 onClickPreventDefault : msg -> Html.Attribute msg
