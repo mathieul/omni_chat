@@ -59,7 +59,7 @@ defmodule OmniChat.Mixfile do
       {:timex, "~> 3.0.5"},
       {:timex_ecto, "~> 3.0.3"},
       {:apex, "~>0.5.1"},
-      {:distillery, "~> 0.9"}
+      {:exrm, "~> 0.18.1"}
     ]
   end
 
