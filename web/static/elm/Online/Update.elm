@@ -74,6 +74,55 @@ update msg model =
             doShowDiscussion discussionId model
 
 
+doInitApplication : AppConfig -> Model -> ( Model, Cmd Msg )
+doInitApplication config model =
+    let
+        socket =
+            Backend.initSocket config.socket_server
+
+        ( phxSocket, phxCmd ) =
+            Backend.doJoinDiscussionHallChannel config socket
+
+        maybeRedirect =
+            case config.discussion_id of
+                Just discussionId ->
+                    Navigation.modifyUrl <| "#discussions/" ++ (toString discussionId)
+
+                Nothing ->
+                    Cmd.none
+
+        maybeDiscussionId =
+            if config.discussion_id == Nothing then
+                case model.route of
+                    DiscussionRoute discussionId ->
+                        Just discussionId
+
+                    _ ->
+                        Nothing
+            else
+                config.discussion_id
+
+        ( phxSocket', phxCmd' ) =
+            case maybeDiscussionId of
+                Just discussionId ->
+                    Backend.doJoinDiscussionChannel discussionId config phxSocket
+
+                Nothing ->
+                    ( phxSocket, Cmd.none )
+    in
+        ( { model
+            | socket = phxSocket'
+            , config = config
+            , discussionId = maybeDiscussionId
+          }
+        , Cmd.batch
+            [ Cmd.map PhoenixMsg phxCmd
+            , Cmd.map PhoenixMsg phxCmd'
+            , maybeRedirect
+            ]
+        )
+
+
 interpretOutMsg : DiscussionEditor.OutMsg -> Model -> ( Model, Cmd Msg )
 interpretOutMsg outmsg model =
     case outmsg of
@@ -146,51 +195,5 @@ doShowDiscussion discussionId model =
         , Cmd.batch
             [ Navigation.modifyUrl <| "#discussions/" ++ (toString discussionId)
             , Cmd.map PhoenixMsg phxCmd
-            ]
-        )
-
-
-doInitApplication : AppConfig -> Model -> ( Model, Cmd Msg )
-doInitApplication config model =
-    let
-        ( phxSocket, phxCmd ) =
-            Backend.doJoinDiscussionHallChannel config model.socket
-
-        maybeRedirect =
-            case config.discussion_id of
-                Just discussionId ->
-                    Navigation.modifyUrl <| "#discussions/" ++ (toString discussionId)
-
-                Nothing ->
-                    Cmd.none
-
-        maybeDiscussionId =
-            if config.discussion_id == Nothing then
-                case model.route of
-                    DiscussionRoute discussionId ->
-                        Just discussionId
-
-                    _ ->
-                        Nothing
-            else
-                config.discussion_id
-
-        ( phxSocket', phxCmd' ) =
-            case maybeDiscussionId of
-                Just discussionId ->
-                    Backend.doJoinDiscussionChannel discussionId config phxSocket
-
-                Nothing ->
-                    ( phxSocket, Cmd.none )
-    in
-        ( { model
-            | socket = phxSocket'
-            , config = config
-            , discussionId = maybeDiscussionId
-          }
-        , Cmd.batch
-            [ Cmd.map PhoenixMsg phxCmd
-            , Cmd.map PhoenixMsg phxCmd'
-            , maybeRedirect
             ]
         )

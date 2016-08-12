@@ -25,8 +25,10 @@ defmodule OmniChat.HomeController do
           "chatter_id"    => chatter.id,
           "nickname"      => chatter.nickname,
           "max_messages"  => OmniChat.DiscussionMessage.max_messages,
-          "discussion_id" => discussion_id
+          "discussion_id" => discussion_id,
+          "socket_server" => Application.get_env(:omni_chat, :socket_server)
         }
+
         render conn, "online.html", chatter: chatter,
                                     elm_module: "Online",
                                     elm_app_config: elm_app_config

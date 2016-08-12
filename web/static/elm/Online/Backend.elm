@@ -2,6 +2,7 @@ module Online.Backend
     exposing
         ( hallChannel
         , discussionChannel
+        , emptySocket
         , initSocket
         , leaveDiscussionChannel
         , doHandlePhoenixMsg
@@ -18,12 +19,6 @@ import Phoenix.Push
 import Online.Types exposing (Model, Msg(..), DiscussionId, AppConfig)
 
 
-socketServer : String
-socketServer =
-    -- "ws://localhost:4000/socket/websocket"
-    "ws://cloudigisafe.com/socket/websocket"
-
-
 hallChannel : String
 hallChannel =
     "discussion:hall"
@@ -34,16 +29,19 @@ discussionChannel discussionId =
     "discussion:" ++ (toString discussionId)
 
 
-initSocket : Socket Msg
-initSocket =
+emptySocket : Socket Msg
+emptySocket =
+    Phoenix.Socket.init ""
+
+
+initSocket : String -> Socket Msg
+initSocket socketServer =
     Phoenix.Socket.init socketServer
-        |> Phoenix.Socket.on "presence_state" hallChannel HandlePresenceState
+        -- |> Phoenix.Socket.withDebug
+        |>
+            Phoenix.Socket.on "presence_state" hallChannel HandlePresenceState
         |> Phoenix.Socket.on "presence_diff" hallChannel HandlePresenceDiff
         |> Phoenix.Socket.on "all_discussions" hallChannel ReceiveAllDiscussions
-
-
-
--- |> Phoenix.Socket.withDebug
 
 
 leaveDiscussionChannel :

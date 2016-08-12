@@ -42,5 +42,6 @@ config :omni_chat, OmniChat.Repo,
   hostname: "localhost",
   pool_size: 10
 
-# Enable Twilio integration?
+# Custom configuration
 config :omni_chat, :twilio_enabled, false
+config :omni_chat, :socket_server, "ws://localhost:4000/socket/websocket"

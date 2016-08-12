@@ -42,6 +42,17 @@ type alias AppConfig =
     , nickname : String
     , max_messages : Int
     , discussion_id : Maybe DiscussionId
+    , socket_server : String
+    }
+
+
+initialAppConfig : AppConfig
+initialAppConfig =
+    { chatter_id = 0
+    , nickname = ""
+    , max_messages = 1
+    , discussion_id = Nothing
+    , socket_server = ""
     }
 
 

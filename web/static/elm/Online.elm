@@ -3,7 +3,7 @@ port module Online exposing (main)
 import Dict exposing (Dict)
 import Navigation
 import Phoenix.Socket exposing (listen)
-import Online.Types exposing (Model, Msg(..), Route, AppConfig)
+import Online.Types exposing (Model, Msg(..), Route, AppConfig, initialAppConfig)
 import Online.Update exposing (update)
 import Online.View exposing (view)
 import Online.Routing as Routing
@@ -46,13 +46,13 @@ urlUpdate result model =
 
 initialModel : Route -> Model
 initialModel route =
-    { socket = Backend.initSocket
+    { socket = Backend.emptySocket
     , connected = False
     , presences = Dict.empty
     , discussions = []
     , discussionId = Nothing
     , messages = []
-    , config = AppConfig 0 "n/a" 1 Nothing
+    , config = initialAppConfig
     , route = route
     , discussionEditorModel = DiscussionEditor.initialModel
     , currentMessage = ""

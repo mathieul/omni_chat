@@ -22,8 +22,9 @@ config :omni_chat, OmniChat.Endpoint,
 # Do not print debug messages in production
 config :logger, level: :info
 
-# Enable Twilio integration?
+# Custom configuration
 config :omni_chat, :twilio_enabled, true
+config :omni_chat, :socket_server, "ws://cloudigisafe.com/socket/websocket"
 
 # ## SSL Support
 #
