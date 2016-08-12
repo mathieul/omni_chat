@@ -21,3 +21,4 @@ config :omni_chat, OmniChat.Repo,
 # Custom configuration
 config :omni_chat, :twilio_enabled, false
 config :omni_chat, :socket_server, "ws://localhost:4000/socket/websocket"
+config :omni_chat, :messaging_service_sid, "MG9c466ba0f4b7900979e845ddea291e91"
