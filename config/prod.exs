@@ -23,7 +23,7 @@ config :omni_chat, OmniChat.Endpoint,
 config :logger, level: :info
 
 # Enable Twilio integration?
-config :omni_chat, :twilio_enabled, false
+config :omni_chat, :twilio_enabled, true
 
 # ## SSL Support
 #

@@ -29,6 +29,9 @@ defmodule OmniChat.Chatter do
     |> generate_authentication_code
   end
 
+  def normalize_phone_number(number),
+    do: Regex.replace(~r/\D+/, number, "")
+
   defp pick_random_nickname(changeset) do
     nickname = get_field(changeset, :nickname)
 
@@ -53,9 +56,6 @@ defmodule OmniChat.Chatter do
 
     put_change(changeset, :phone_number, normalized_number)
   end
-
-  defp normalize_phone_number(number),
-    do: Regex.replace(~r/\D+/, number, "")
 
   def authentication_message(chatter) do
     "#{chatter.authentication_code} is your OmniChat authentication code"
