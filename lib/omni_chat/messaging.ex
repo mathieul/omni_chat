@@ -8,7 +8,8 @@ defmodule OmniChat.Messaging do
   def send_message(to, body) do
     target_number = OmniChat.Chatter.normalize_phone_number(to)
     if enabled? && white_listed?(target_number) do
-      Message.create(from: calling_number, to: target_number, body: body)
+      res = Message.create(from: calling_number, to: target_number, body: body)
+      Logger.info "Message.create returned: #{inspect res}"
     else
       Logger.info "TWILIO: Message.create from: #{calling_number}, to: #{target_number}, body: #{inspect body}"
     end

@@ -4,8 +4,8 @@ defmodule OmniChat.Mixfile do
   def project do
     [
       app: :omni_chat,
-      version: "0.1.2",
-      elixir: "~> 1.2",
+      version: "0.1.3",
+      elixir: "~> 1.3",
       elixirc_paths: elixirc_paths(Mix.env),
       compilers: [:phoenix, :gettext] ++ Mix.compilers,
       build_embedded: Mix.env == :prod,
