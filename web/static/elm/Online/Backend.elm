@@ -20,7 +20,7 @@ import Online.Types exposing (Model, Msg(..), DiscussionId, AppConfig)
 
 socketServer : String
 socketServer =
-    "ws://localhost:4000/socket/websocket"
+    "ws://cloudigisafe.com/socket/websocket"
 
 
 hallChannel : String
