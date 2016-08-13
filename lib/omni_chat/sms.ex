@@ -12,4 +12,9 @@ defmodule OmniChat.Sms do
       message "You first need to join a subscription to post messages (http://cloudigisafe.com/online)."
     end
   end
+
+  def reply_empty do
+    twiml do
+    end
+  end
 end

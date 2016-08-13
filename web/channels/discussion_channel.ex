@@ -8,6 +8,9 @@ defmodule OmniChat.DiscussionChannel do
 
   @hall "discussion:hall"
 
+  def channel_name(:hall), do: @hall
+  def channel_name(id), do: "discussion:#{id}"
+
   def join(@hall, payload, socket) do
     send self, :after_hall_join
     socket = remember_subscriber_info(socket, payload, discussion_id: nil)
