@@ -25,18 +25,18 @@ defmodule OmniChat.ChatterController do
       Chatter.authentication_changeset(%Chatter{}, %{phone_number: phone_number})
     end
 
-    if changeset.valid? do
-      chatter = Repo.insert_or_update!(changeset)
+    case Repo.insert_or_update(changeset) do
+      {:ok, chatter} ->
+        # send SMS with authentication code
+        OmniChat.Messaging.send_message(chatter.phone_number, Chatter.authentication_message(chatter))
 
-      # send SMS with authentication code
-      OmniChat.Messaging.send_message(chatter.phone_number, Chatter.authentication_message(chatter))
+        # redirect to authentication code form (code + nickname)
+        conn
+        |> put_session(:chatter_id, chatter.id)
+        |> redirect(to: session_path(conn, :new))
 
-      # redirect to authentication code form (code + nickname)
-      conn
-      |> put_session(:chatter_id, chatter.id)
-      |> redirect(to: session_path(conn, :new))
-    else
-      render conn, "new.html", changeset: changeset
+      {:error, changeset} ->
+        render conn, "new.html", changeset: changeset
     end
   end
 

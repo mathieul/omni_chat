@@ -20,6 +20,7 @@ defmodule OmniChat.Chatter do
     |> pick_random_nickname
     |> validate_required([:nickname])
     |> unique_constraint(:nickname)
+    |> generate_authentication_code
   end
 
   def authentication_changeset(struct, params) do
