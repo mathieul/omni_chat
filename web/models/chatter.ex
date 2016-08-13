@@ -9,12 +9,14 @@ defmodule OmniChat.Chatter do
     field :authentication_code, :string
     field :nickname, :string
 
+    belongs_to :discussion, OmniChat.Discussion
     timestamps()
   end
 
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:phone_number, :nickname])
+    |> cast(params, [:phone_number, :nickname, :discussion_id])
+    |> assoc_constraint(:discussion)
     |> pick_random_nickname
     |> validate_required([:nickname])
     |> unique_constraint(:nickname)
@@ -71,6 +73,11 @@ defmodule OmniChat.Chatter do
   def with_phone_number(number) do
     normalized_number = normalize_phone_number(number)
     from c in __MODULE__, where: c.phone_number == ^normalized_number, limit: 1
+  end
+
+  def for_discussion(discussion_id, except: chatter_ids) do
+    from c in __MODULE__,
+      where: c.discussion_id == ^discussion_id and not c.id in ^chatter_ids
   end
 
   defp generate_authentication_code(changeset) do

@@ -1,10 +1,10 @@
 defmodule OmniChat.DiscussionChannel do
   use OmniChat.Web, :channel
   alias OmniChat.Presence
+  alias OmniChat.Chatter
   alias OmniChat.Discussion
   alias OmniChat.DiscussionMessage
   alias OmniChat.DiscussionMessageSerializer
-  alias OmniChat.Subscription
 
   @hall "discussion:hall"
 
@@ -31,7 +31,9 @@ defmodule OmniChat.DiscussionChannel do
   end
 
   def handle_info({:after_single_join, discussion_id}, socket) do
-    subscribe_to_discussion(socket)
+    subscribe_to_discussion(socket.assigns.chatter_id,
+                            discussion_id: socket.assigns.discussion_id,
+                            socket: socket)
     messages = DiscussionMessage.fetch_recent_messages(discussion_id)
     collection_payload = JaSerializer.format(DiscussionMessageSerializer, messages)
     push socket, "messages", collection_payload
@@ -74,7 +76,7 @@ defmodule OmniChat.DiscussionChannel do
   end
 
   def terminate({:shutdown, :left}, socket) do
-    unsubscribe_from_discussion(socket)
+    subscribe_to_discussion(socket.assigns.chatter_id, discussion_id: nil, socket: socket)
     :ok
   end
 
@@ -115,23 +117,19 @@ defmodule OmniChat.DiscussionChannel do
     "Hey there. So what about \"#{discussion.subject}\""
   end
 
-  defp subscribe_to_discussion(socket) do
-    params = Map.take(socket.assigns, [:chatter_id, :discussion_id])
-    changeset = Subscription.changeset(%Subscription{}, params)
-    case Repo.insert(changeset) do
-      {:error, changeset} ->
-        push_changeset_errors(changeset, socket)
-      _ ->
-      nil
+  defp subscribe_to_discussion(chatter_id, discussion_id: discussion_id, socket: socket) do
+    case Repo.get(Chatter, chatter_id) do
+      nil ->
+        nil
+      chatter ->
+        changeset = Chatter.changeset(chatter, %{discussion_id: discussion_id})
+        case Repo.update(changeset) do
+          {:error, changeset} ->
+            push_changeset_errors(changeset, socket)
+          _ ->
+          nil
+        end
     end
-  end
-
-  defp unsubscribe_from_discussion(socket) do
-    Map.take(socket.assigns, [:chatter_id, :discussion_id])
-    |> Subscription.find_by_discussion_and_chatter
-    |> Repo.delete_all
-
-    {:noreply, socket}
   end
 
   defp propagate_message(message, socket) do
@@ -144,12 +142,8 @@ defmodule OmniChat.DiscussionChannel do
       |> Enum.concat([socket.assigns.chatter_id])
       |> Enum.uniq
 
-    %{discussion_id: socket.assigns.discussion_id, chatter_ids: chatter_ids}
-    |> Subscription.find_by_discussion_not_those_chatters
+    Chatter.for_discussion(socket.assigns.discussion_id, except: chatter_ids)
     |> Repo.all
-    |> Repo.preload(:chatter)
-    |> Enum.map(&(&1.chatter))
-    |> Enum.uniq
     |> Enum.each(fn chatter -> send_text_message(chatter, message) end)
   end
 
