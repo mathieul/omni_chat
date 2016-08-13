@@ -3,6 +3,7 @@ defmodule OmniChat.SmsController do
   alias OmniChat.Sms
   alias OmniChat.Chatter
   alias OmniChat.DiscussionChannel
+  alias OmniChat.DiscussionMessage
 
   def reply(conn, %{"Body" => body, "From" => from}) do
     case Chatter.with_phone_number(from) |> Repo.one do
@@ -25,9 +26,10 @@ defmodule OmniChat.SmsController do
     |> send_resp(200, content)
   end
 
-  defp propagate_message(message, chatter: chatter) do
+  defp propagate_message(content, chatter: chatter) do
     channel_name = DiscussionChannel.channel_name(chatter.discussion_id)
-    OmniChat.Endpoint.broadcast channel_name, "message", JaSerializer.format(DiscussionMessageSerializer, message)
+    serialized_message = serialize_discussion_message(content, chatter: chatter)
+    OmniChat.Endpoint.broadcast channel_name, "message", serialized_message
 
     chatter_ids =
       OmniChat.Presence.list(DiscussionChannel.channel_name(:hall))
@@ -38,7 +40,16 @@ defmodule OmniChat.SmsController do
 
     Chatter.for_discussion(chatter.discussion_id, except: chatter_ids)
     |> Repo.all
-    |> Enum.each(fn chatter -> send_text_message(chatter, message) end)
+    |> Enum.each(fn chatter -> send_text_message(chatter, serialized_message) end)
+  end
+
+  defp serialize_discussion_message(content, chatter: chatter) do
+    message = DiscussionMessage.changeset(%DiscussionMessage{}, %{
+      content: content,
+      chatter_id: chatter.id,
+      discussion_id: chatter.discussion_id
+    })
+    JaSerializer.format(OmniChat.DiscussionMessageSerializer, message)
   end
 
   defp send_text_message(chatter, message) do
