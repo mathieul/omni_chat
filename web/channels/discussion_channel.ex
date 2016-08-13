@@ -64,16 +64,9 @@ defmodule OmniChat.DiscussionChannel do
   end
 
   def handle_in("send_message", %{"content" => content}, socket) do
-    discussion = Repo.get(Discussion, socket.assigns.discussion_id)
-    message =
-      discussion
-      |> Ecto.build_assoc(:discussion_messages,
-                          content: content,
-                          chatter_id: socket.assigns.chatter_id)
-      |> Repo.insert!
-      |> Repo.preload(:chatter)
-
-    propagate_message(message, socket)
+    chatter = Repo.get!(Chatter, socket.assigns.chatter_id)
+    OmniChat.Messenger.send_message(content, chatter: chatter,
+                                             discussion_id: socket.assigns.discussion_id)
 
     {:noreply, socket}
   end
@@ -133,25 +126,5 @@ defmodule OmniChat.DiscussionChannel do
           nil
         end
     end
-  end
-
-  defp propagate_message(message, socket) do
-    broadcast socket, "message", JaSerializer.format(DiscussionMessageSerializer, message)
-
-    chatter_ids =
-      Presence.list(@hall)
-      |> Map.keys
-      |> Enum.map(&String.to_integer/1)
-      |> Enum.concat([socket.assigns.chatter_id])
-      |> Enum.uniq
-
-    Chatter.for_discussion(socket.assigns.discussion_id, except: chatter_ids)
-    |> Repo.all
-    |> Enum.each(fn chatter -> send_text_message(chatter, message) end)
-  end
-
-  defp send_text_message(chatter, message) do
-    content = "#{message.chatter.nickname}: #{message.content}"
-    OmniChat.Messaging.send_message(chatter.phone_number, content)
   end
 end

@@ -1,6 +1,7 @@
 defmodule OmniChat.ChatterController do
   use OmniChat.Web, :controller
   alias OmniChat.Chatter
+  alias OmniChat.SmsMessaging
 
   plug OmniChat.Authentication, [ auth_path: "/chatter/new" ] when action in [:edit, :update]
 
@@ -28,7 +29,7 @@ defmodule OmniChat.ChatterController do
     case Repo.insert_or_update(changeset) do
       {:ok, chatter} ->
         # send SMS with authentication code
-        OmniChat.Messaging.send_message(chatter.phone_number, Chatter.authentication_message(chatter))
+        SmsMessaging.send_message(chatter.phone_number, Chatter.authentication_message(chatter))
 
         # redirect to authentication code form (code + nickname)
         conn
