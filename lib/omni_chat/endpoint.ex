@@ -1,5 +1,6 @@
 defmodule OmniChat.Endpoint do
   use Phoenix.Endpoint, otp_app: :omni_chat
+  use Timex
 
   socket "/socket", OmniChat.UserSocket
 
@@ -36,7 +37,10 @@ defmodule OmniChat.Endpoint do
   plug Plug.Session,
     store: :cookie,
     key: "_omni_chat_key",
-    signing_salt: "EJyl3969"
+    signing_salt: "EJyl3969",
+    encryption_salt: "2iIyKqQIHi3ekA",
+    domain: Application.get_env(:omni_chat, :domain),
+    max_age: Duration.to_seconds(2, :weeks)
 
   plug OmniChat.Router
 end
