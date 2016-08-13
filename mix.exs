@@ -48,6 +48,7 @@ defmodule OmniChat.Mixfile do
     [
       {:apex, "~>0.5.1"},
       {:cowboy, "~> 1.0"},
+      {:ex_machina, "~> 1.0", only: :test},
       {:ex_twilio, "~> 0.2.0"},
       {:ex_twiml, "~> 2.1.0"},
       {:exrm, "~> 1.0.8"},
