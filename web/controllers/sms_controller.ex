@@ -38,9 +38,10 @@ defmodule OmniChat.SmsController do
       |> Enum.concat([chatter.id])
       |> Enum.uniq
 
+    author = chatter.nickname
     Chatter.for_discussion(chatter.discussion_id, except: chatter_ids)
     |> Repo.all
-    |> Enum.each(fn chatter -> send_text_message(chatter, serialized_message) end)
+    |> Enum.each(fn chatter -> send_text_message(chatter, content, author: author) end)
   end
 
   defp serialize_discussion_message(content, chatter: chatter) do
@@ -52,7 +53,8 @@ defmodule OmniChat.SmsController do
     JaSerializer.format(OmniChat.DiscussionMessageSerializer, message)
   end
 
-  defp send_text_message(chatter, message) do
-    OmniChat.Messaging.send_message(chatter.phone_number, message.content)
+  defp send_text_message(chatter, content, author: author) do
+    content = "#{author}: #{content}"
+    OmniChat.Messaging.send_message(chatter.phone_number, content)
   end
 end

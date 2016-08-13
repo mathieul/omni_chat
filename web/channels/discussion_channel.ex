@@ -151,6 +151,7 @@ defmodule OmniChat.DiscussionChannel do
   end
 
   defp send_text_message(chatter, message) do
-    OmniChat.Messaging.send_message(chatter.phone_number, message.content)
+    content = "#{message.chatter.nickname}: #{message.content}"
+    OmniChat.Messaging.send_message(chatter.phone_number, content)
   end
 end
