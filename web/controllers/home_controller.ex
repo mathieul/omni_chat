@@ -15,7 +15,6 @@ defmodule OmniChat.HomeController do
         |> redirect(to: "/")
 
       chatter ->
-
         render conn, "online.html", chatter: chatter,
                                     elm_module: "Online",
                                     elm_app_config: elm_app_config(chatter)
@@ -25,11 +24,8 @@ defmodule OmniChat.HomeController do
   defp elm_app_config(chatter) do
     maybe_discussion_id = if chatter.discussion_id do
       Integer.to_string(chatter.discussion_id)
-    else
-      nil
     end
-
-    elm_app_config = %{
+    %{
       "chatter_id"          => Integer.to_string(chatter.id),
       "nickname"            => chatter.nickname,
       "max_messages"        => Integer.to_string(OmniChat.DiscussionMessage.max_messages),

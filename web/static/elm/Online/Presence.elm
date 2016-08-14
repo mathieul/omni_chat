@@ -34,9 +34,6 @@ processPresenceDiff raw model =
     case JD.decodeValue presenceDiffDecoder raw of
         Ok presenceDiff ->
             let
-                _ =
-                    Debug.log "PRESENCE_DIFF" presenceDiff
-
                 presencesAfterDel =
                     presenceDiff.leaves
                         |> Dict.keys
