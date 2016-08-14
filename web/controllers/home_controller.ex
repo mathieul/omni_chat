@@ -24,6 +24,8 @@ defmodule OmniChat.HomeController do
   defp elm_app_config(chatter) do
     maybe_discussion_id = if chatter.discussion_id do
       Integer.to_string(chatter.discussion_id)
+    else
+      "null"
     end
     %{
       "chatter_id"          => Integer.to_string(chatter.id),
