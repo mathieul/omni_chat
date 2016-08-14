@@ -7,15 +7,15 @@ import JsonApi
 import JsonApi.Documents
 import JsonApi.Decode
 import JsonApi.Resources
-import Online.Types exposing (Model, Msg, DiscussionMessage, Chatter)
+import Online.Types exposing (Model, DiscussionMessage, Chatter)
 
 
-receiveCollection : JE.Value -> Model -> ( Model, Cmd Msg )
+receiveCollection : JE.Value -> Model -> Model
 receiveCollection raw model =
-    { model | messages = extractMessageCollectionFromJson raw } ! []
+    { model | messages = extractMessageCollectionFromJson raw }
 
 
-receiveOne : JE.Value -> Model -> ( Model, Cmd Msg )
+receiveOne : JE.Value -> Model -> Model
 receiveOne raw model =
     let
         messages =
@@ -25,7 +25,7 @@ receiveOne raw model =
                 |> (::) (extractMessageFromJson raw)
                 |> List.reverse
     in
-        { model | messages = messages } ! []
+        { model | messages = messages }
 
 
 extractMessageCollectionFromJson : JE.Value -> List DiscussionMessage

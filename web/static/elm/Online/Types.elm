@@ -3,6 +3,7 @@ module Online.Types exposing (..)
 import Dict exposing (Dict)
 import Phoenix.Socket
 import Json.Encode exposing (Value)
+import Dom
 import Components.DiscussionEditor as DiscussionEditor
 
 
@@ -57,7 +58,9 @@ initialAppConfig =
 
 
 type Msg
-    = InitApplication AppConfig
+    = NoOp ()
+    | DomError Dom.Error
+    | InitApplication AppConfig
     | PhoenixMsg (Phoenix.Socket.Msg Msg)
     | HandlePresenceState Value
     | HandlePresenceDiff Value

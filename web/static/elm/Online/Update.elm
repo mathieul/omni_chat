@@ -1,7 +1,8 @@
 module Online.Update exposing (update)
 
-import Json.Encode as JE
 import Navigation
+import Task
+import Dom.Scroll exposing (toBottom)
 import OutMessage
 import Online.Types exposing (..)
 import Online.Backend as Backend
@@ -14,6 +15,12 @@ import Components.DiscussionEditor as DiscussionEditor
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        NoOp _ ->
+            model ! []
+
+        DomError error ->
+            model ! []
+
         InitApplication config ->
             doInitApplication config model
 
@@ -39,10 +46,14 @@ update msg model =
             Discussion.receiveAll raw model
 
         ReceiveMessageList raw ->
-            DiscussionMessage.receiveCollection raw model
+            ( DiscussionMessage.receiveCollection raw model
+            , Task.perform DomError NoOp (toBottom "main")
+            )
 
         ReceiveMessage raw ->
-            DiscussionMessage.receiveOne raw model
+            ( DiscussionMessage.receiveOne raw model
+            , Task.perform DomError NoOp (toBottom "main")
+            )
 
         UpdateCurrentMessage content ->
             { model | currentMessage = content } ! []
