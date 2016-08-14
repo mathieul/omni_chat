@@ -37,9 +37,7 @@ emptySocket =
 initSocket : String -> Socket Msg
 initSocket socketServer =
     Phoenix.Socket.init socketServer
-        -- |> Phoenix.Socket.withDebug
-        |>
-            Phoenix.Socket.on "presence_state" hallChannel HandlePresenceState
+        |> Phoenix.Socket.on "presence_state" hallChannel HandlePresenceState
         |> Phoenix.Socket.on "presence_diff" hallChannel HandlePresenceDiff
         |> Phoenix.Socket.on "all_discussions" hallChannel ReceiveAllDiscussions
 
