@@ -22,7 +22,7 @@ view discussion model =
 messageListView : Model -> Html Msg
 messageListView model =
     div [ id "discussion-messages" ]
-        (List.map (messageView model.config.chatter_id) model.messages)
+        (List.map (messageView model.config.chatterId) model.messages)
 
 
 messageView : ChatterId -> DiscussionMessage -> Html Msg

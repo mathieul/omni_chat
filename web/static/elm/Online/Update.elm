@@ -21,8 +21,8 @@ update msg model =
         DomError error ->
             model ! []
 
-        InitApplication config ->
-            doInitApplication config model
+        InitApplication ->
+            doInitApplication model
 
         PhoenixMsg phxMsg ->
             Backend.doHandlePhoenixMsg phxMsg model
@@ -85,17 +85,14 @@ update msg model =
             doShowDiscussion discussionId model
 
 
-doInitApplication : AppConfig -> Model -> ( Model, Cmd Msg )
-doInitApplication config model =
+doInitApplication : Model -> ( Model, Cmd Msg )
+doInitApplication model =
     let
-        socket =
-            Backend.initSocket config.socket_server
-
         ( phxSocket, phxCmd ) =
-            Backend.doJoinDiscussionHallChannel config socket
+            Backend.doJoinDiscussionHallChannel model.config model.socket
 
         maybeRedirect =
-            case config.discussion_id of
+            case model.config.discussionId of
                 Just discussionId ->
                     Navigation.modifyUrl <| "#discussions/" ++ (toString discussionId)
 
@@ -103,7 +100,7 @@ doInitApplication config model =
                     Cmd.none
 
         maybeDiscussionId =
-            if config.discussion_id == Nothing then
+            if model.config.discussionId == Nothing then
                 case model.route of
                     DiscussionRoute discussionId ->
                         Just discussionId
@@ -111,19 +108,18 @@ doInitApplication config model =
                     _ ->
                         Nothing
             else
-                config.discussion_id
+                model.config.discussionId
 
         ( phxSocket', phxCmd' ) =
             case maybeDiscussionId of
                 Just discussionId ->
-                    Backend.doJoinDiscussionChannel discussionId config phxSocket
+                    Backend.doJoinDiscussionChannel discussionId model.config phxSocket
 
                 Nothing ->
                     ( phxSocket, Cmd.none )
     in
         ( { model
             | socket = phxSocket'
-            , config = config
             , discussionId = maybeDiscussionId
           }
         , Cmd.batch

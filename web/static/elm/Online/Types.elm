@@ -39,28 +39,18 @@ type Route
 
 
 type alias AppConfig =
-    { chatter_id : ChatterId
+    { chatterId : ChatterId
     , nickname : String
-    , max_messages : Int
-    , discussion_id : Maybe DiscussionId
-    , socket_server : String
-    }
-
-
-initialAppConfig : AppConfig
-initialAppConfig =
-    { chatter_id = 0
-    , nickname = ""
-    , max_messages = 1
-    , discussion_id = Nothing
-    , socket_server = ""
+    , maxMessages : Int
+    , discussionId : Maybe DiscussionId
+    , socketServer : String
     }
 
 
 type Msg
     = NoOp ()
     | DomError Dom.Error
-    | InitApplication AppConfig
+    | InitApplication
     | PhoenixMsg (Phoenix.Socket.Msg Msg)
     | HandlePresenceState Value
     | HandlePresenceDiff Value

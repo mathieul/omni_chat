@@ -117,7 +117,7 @@ doJoinDiscussionHallChannel config socket =
 userParams : AppConfig -> JE.Value
 userParams config =
     JE.object
-        [ ( "chatter_id", JE.int config.chatter_id )
+        [ ( "chatter_id", JE.int config.chatterId )
         , ( "nickname", JE.string config.nickname )
         ]
 

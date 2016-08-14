@@ -21,7 +21,7 @@ receiveOne raw model =
         messages =
             model.messages
                 |> List.reverse
-                |> List.take (model.config.max_messages - 1)
+                |> List.take (model.config.maxMessages - 1)
                 |> (::) (extractMessageFromJson raw)
                 |> List.reverse
     in

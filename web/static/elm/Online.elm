@@ -1,9 +1,10 @@
 port module Online exposing (main)
 
+import String
 import Dict exposing (Dict)
 import Navigation
 import Phoenix.Socket exposing (listen)
-import Online.Types exposing (Model, Msg(..), Route, AppConfig, initialAppConfig)
+import Online.Types exposing (Model, Msg(..), Route, AppConfig)
 import Online.Update exposing (update)
 import Online.View exposing (view)
 import Online.Routing as Routing
@@ -11,9 +12,9 @@ import Online.Backend as Backend
 import Components.DiscussionEditor as DiscussionEditor
 
 
-main : Program Never
+main : Program ConfigFromJs
 main =
-    Navigation.program Routing.parser
+    Navigation.programWithFlags Routing.parser
         { init = init
         , update = update
         , subscriptions = subscriptions
@@ -22,13 +23,13 @@ main =
         }
 
 
-init : Result String Route -> ( Model, Cmd Msg )
-init result =
+init : ConfigFromJs -> Result String Route -> ( Model, Cmd Msg )
+init rawConfig result =
     let
         currentRoute =
             Routing.routeFromResult result
     in
-        ( initialModel currentRoute, Cmd.none )
+        ( initialModel rawConfig currentRoute, Cmd.none )
 
 
 urlUpdate : Result String Route -> Model -> ( Model, Cmd Msg )
@@ -44,15 +45,34 @@ urlUpdate result model =
 -- MODEL
 
 
-initialModel : Route -> Model
-initialModel route =
-    { socket = Backend.emptySocket
+type alias ConfigFromJs =
+    { chatter_id : String
+    , nickname : String
+    , max_messages : String
+    , maybe_discussion_id : String
+    , socket_server : String
+    }
+
+
+initialAppConfig : ConfigFromJs -> AppConfig
+initialAppConfig rawConfig =
+    { chatterId = Result.withDefault 0 (String.toInt rawConfig.chatter_id)
+    , nickname = rawConfig.nickname
+    , maxMessages = Result.withDefault 1 (String.toInt rawConfig.max_messages)
+    , discussionId = Result.toMaybe (String.toInt rawConfig.maybe_discussion_id)
+    , socketServer = rawConfig.socket_server
+    }
+
+
+initialModel : ConfigFromJs -> Route -> Model
+initialModel rawConfig route =
+    { socket = Backend.initSocket rawConfig.socket_server
     , connected = False
     , presences = Dict.empty
     , discussions = []
     , discussionId = Nothing
     , messages = []
-    , config = initialAppConfig
+    , config = initialAppConfig rawConfig
     , route = route
     , discussionEditorModel = DiscussionEditor.initialModel
     , currentMessage = ""
@@ -67,8 +87,8 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ listen model.socket PhoenixMsg
-        , initApplication InitApplication
+        , initApplication (always InitApplication)
         ]
 
 
-port initApplication : (AppConfig -> msg) -> Sub msg
+port initApplication : (() -> msg) -> Sub msg
