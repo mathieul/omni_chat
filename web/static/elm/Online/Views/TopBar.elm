@@ -1,4 +1,4 @@
-module Online.TopBarView exposing (view)
+module Online.Views.TopBar exposing (view)
 
 import String.Extra
 import Json.Decode as Json

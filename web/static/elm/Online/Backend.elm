@@ -2,7 +2,6 @@ module Online.Backend
     exposing
         ( hallChannel
         , discussionChannel
-        , emptySocket
         , initSocket
         , leaveDiscussionChannel
         , doHandlePhoenixMsg
@@ -27,11 +26,6 @@ hallChannel =
 discussionChannel : DiscussionId -> String
 discussionChannel discussionId =
     "discussion:" ++ (toString discussionId)
-
-
-emptySocket : Socket Msg
-emptySocket =
-    Phoenix.Socket.init ""
 
 
 initSocket : String -> Socket Msg

@@ -1,10 +1,10 @@
-module Online.DiscussionView exposing (view)
+module Online.Views.Discussion exposing (view)
 
 import Html exposing (Html, div, text, form, input, button, strong)
 import Html.Attributes exposing (class, type', style, id, value, autofocus)
 import Html.Events exposing (onSubmit, onInput)
 import Online.Types exposing (..)
-import Online.TopBarView as TopBarView
+import Online.Views.TopBar as TopBarView
 
 
 view : Discussion -> Model -> Html Msg

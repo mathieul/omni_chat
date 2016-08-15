@@ -1,11 +1,11 @@
-module Online.DiscussionListView exposing (view)
+module Online.Views.DiscussionList exposing (view)
 
 import Html.App as App
 import Html exposing (Html, div, header, text, h4, p, dl, dt, dd, ul, li, button, i)
 import Html.Attributes exposing (class, classList, type')
 import Html.Events exposing (onClick)
 import Online.Types exposing (..)
-import Online.TopBarView as TopBarView
+import Online.Views.TopBar as TopBarView
 import Components.DiscussionEditor as DiscussionEditor
 
 

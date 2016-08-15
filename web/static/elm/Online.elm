@@ -6,7 +6,7 @@ import Navigation
 import Phoenix.Socket exposing (listen)
 import Online.Types exposing (Model, Msg(..), Route, AppConfig)
 import Online.Update exposing (update)
-import Online.View exposing (view)
+import Online.Views.Main exposing (view)
 import Online.Routing as Routing
 import Online.Backend as Backend
 import Components.DiscussionEditor as DiscussionEditor

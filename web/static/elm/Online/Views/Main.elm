@@ -1,12 +1,12 @@
-module Online.View exposing (view)
+module Online.Views.Main exposing (view)
 
 import List.Extra
 import Html exposing (Html, div, text, button, header, i)
 import Html.Attributes exposing (class)
-import Online.DiscussionListView as DiscussionListView
-import Online.DiscussionView as DiscussionView
 import Online.Types exposing (Model, Msg(..), Route(..))
-import Online.TopBarView as TopBarView
+import Online.Views.TopBar as TopBarView
+import Online.Views.DiscussionList as DiscussionListView
+import Online.Views.Discussion as DiscussionView
 
 
 view : Model -> Html Msg
