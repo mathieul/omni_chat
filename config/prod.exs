@@ -24,7 +24,7 @@ config :logger, level: :info
 
 # Custom configuration
 config :omni_chat, :twilio_enabled, true
-config :omni_chat, :socket_server, "ws://cloudigisafe.com/socket/websocket"
+config :omni_chat, :socket_server, "wss://cloudigisafe.com/socket/websocket"
 config :omni_chat, :messaging_service_sid, "MG9c466ba0f4b7900979e845ddea291e91"
 config :omni_chat, :domain, "cloudigisafe.com"
 
