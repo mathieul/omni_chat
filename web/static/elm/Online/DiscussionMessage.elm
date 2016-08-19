@@ -1,7 +1,7 @@
 module Online.DiscussionMessage exposing (receiveCollection, receiveOne)
 
 import Dict exposing (Dict)
-import Json.Decode as JD
+import Json.Decode as JD exposing ((:=))
 import Json.Encode as JE
 import JsonApi
 import JsonApi.Documents
@@ -71,39 +71,33 @@ extractMessageFromDocument document =
 extractMessageFromResource : JsonApi.Resource -> DiscussionMessage
 extractMessageFromResource messageResource =
     let
-        attributes =
-            JsonApi.Resources.attributes messageResource
+        content =
+            messageResource
+                |> JsonApi.Resources.attributes ("content" := JD.string)
+                |> Result.withDefault ""
     in
         { chatter = extractChatterAsRelatedResource messageResource
-        , content = getStringAttribute "content" attributes
+        , content = content
         }
 
 
 extractChatterAsRelatedResource : JsonApi.Resource -> Chatter
 extractChatterAsRelatedResource messageResource =
-    let
-        attributes =
-            case JsonApi.Resources.relatedResource "chatter" messageResource of
+    case JsonApi.Resources.relatedResource "chatter" messageResource of
+        Ok chatterValue ->
+            case JsonApi.Resources.attributes chatterDecoder chatterValue of
                 Ok chatter ->
-                    JsonApi.Resources.attributes chatter
+                    chatter
 
                 Err error ->
                     Debug.crash error
-    in
-        { id = getIntAttribute "id" attributes
-        , nickname = getStringAttribute "nickname" attributes
-        }
+
+        Err error ->
+            Debug.crash error
 
 
-getStringAttribute : String -> Dict String JD.Value -> String
-getStringAttribute key dict =
-    Dict.get key dict
-        `Maybe.andThen` (JD.decodeValue JD.string >> Result.toMaybe)
-        |> Maybe.withDefault "???"
-
-
-getIntAttribute : String -> Dict String JD.Value -> Int
-getIntAttribute key dict =
-    Dict.get key dict
-        `Maybe.andThen` (JD.decodeValue JD.int >> Result.toMaybe)
-        |> Maybe.withDefault 0
+chatterDecoder : JD.Decoder Chatter
+chatterDecoder =
+    JD.object2 Chatter
+        ("id" := JD.int)
+        ("nickname" := JD.string)
