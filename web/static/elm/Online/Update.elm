@@ -15,10 +15,7 @@ import Components.DiscussionEditor as DiscussionEditor
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        NoOp _ ->
-            model ! []
-
-        DomError error ->
+        NoOp ->
             model ! []
 
         InitApplication ->
@@ -47,12 +44,12 @@ update msg model =
 
         ReceiveMessageList raw ->
             ( DiscussionMessage.receiveCollection raw model
-            , Task.perform DomError NoOp (toBottom "main")
+            , Task.perform (always NoOp) (always NoOp) (toBottom "main")
             )
 
         ReceiveMessage raw ->
             ( DiscussionMessage.receiveOne raw model
-            , Task.perform DomError NoOp (toBottom "main")
+            , Task.perform (always NoOp) (always NoOp) (toBottom "main")
             )
 
         UpdateCurrentMessage content ->

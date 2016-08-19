@@ -48,8 +48,7 @@ type alias AppConfig =
 
 
 type Msg
-    = NoOp ()
-    | DomError Dom.Error
+    = NoOp
     | InitApplication
     | PhoenixMsg (Phoenix.Socket.Msg Msg)
     | HandlePresenceState Value

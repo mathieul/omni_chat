@@ -2,9 +2,13 @@
   <div class="jumbotron text-xs-center">
     <h1>OmniChat <small>Communication everywhere</small></h1>
     <p class="lead">
-      Cras justo odio, dapibus ac facilisis in, egestas eget quam.
-      Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh,
-      ut fermentum massa justo sit amet.
+      Start or join a public discussion.
+    </p>
+    <p class="lead">
+      Close your browser to go on using text messages.
+    </p>
+    <p class="lead">
+      Come back in the browser to leave the discussion and stop receiving text messages.
     </p>
     <p>
       <%= link "Start Now", to: chatter_path(@conn, :new), class: "btn btn-lg btn-success" %>
