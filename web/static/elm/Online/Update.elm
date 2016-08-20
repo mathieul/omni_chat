@@ -19,10 +19,12 @@ update msg model =
             model ! []
 
         InitApplication ->
-            doInitApplication model
+            ( model, Cmd.none )
+                |> joinDiscussionHallChannel
+                |> joinDiscussionChannelIfApplicable
 
         PhoenixMsg phxMsg ->
-            Backend.doHandlePhoenixMsg phxMsg model
+            Backend.handlePhoenixMsg phxMsg model
 
         DidJoinChannel ->
             { model | connected = True } ! []
@@ -49,18 +51,7 @@ update msg model =
             { model | currentMessage = content } ! []
 
         SendMessage ->
-            let
-                discussionId =
-                    Maybe.withDefault 0 model.discussionId
-
-                ( phxSocket, phxCmd ) =
-                    Backend.doSendMessage model.currentMessage discussionId model.socket
-            in
-                { model
-                    | socket = phxSocket
-                    , currentMessage = ""
-                }
-                    ! [ Cmd.map PhoenixMsg phxCmd ]
+            sendMessage model
 
         HandlePresenceState raw ->
             (Presence.processPresenceState raw model) ! []
@@ -69,10 +60,10 @@ update msg model =
             (Presence.processPresenceDiff raw model) ! []
 
         ShowDiscussionList ->
-            doShowDiscussionList model
+            showDiscussionList model
 
         ShowDiscussion discussionId ->
-            doShowDiscussion discussionId model
+            showDiscussion discussionId model
 
         StartEditingDiscussion ->
             ( { model | editingDiscussion = True }
@@ -86,49 +77,23 @@ update msg model =
             { model | discussionSubject = subject } ! []
 
         CreateDiscussion subject ->
-            let
-                cleanSubject =
-                    subject
-                        |> String.trim
-                        |> String.toLower
-                        |> String.Extra.humanize
-
-                newDiscussion =
-                    { id = 0
-                    , subject = subject
-                    , participants = []
-                    , last_activity = "loading..."
-                    }
-
-                ( newModel, commands ) =
-                    doRequestDiscussionCreation newDiscussion model
-            in
-                if String.isEmpty cleanSubject then
-                    model ! []
-                else
-                    ( { newModel
-                        | discussions = newDiscussion :: model.discussions
-                        , discussionSubject = ""
-                        , editingDiscussion = False
-                      }
-                    , commands
-                    )
+            createDiscussion subject model
 
 
-doInitApplication : Model -> ( Model, Cmd Msg )
-doInitApplication model =
+joinDiscussionHallChannel : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
+joinDiscussionHallChannel ( model, cmds ) =
     let
         ( phxSocket, phxCmd ) =
-            Backend.doJoinDiscussionHallChannel model.config model.socket
+            Backend.joinDiscussionHallChannel model.config model.socket
+    in
+        ( { model | socket = phxSocket }
+        , Cmd.batch [ cmds, Cmd.map PhoenixMsg phxCmd ]
+        )
 
-        maybeRedirect =
-            case model.config.discussionId of
-                Just discussionId ->
-                    Navigation.modifyUrl <| "#discussions/" ++ (toString discussionId)
 
-                Nothing ->
-                    Cmd.none
-
+joinDiscussionChannelIfApplicable : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
+joinDiscussionChannelIfApplicable ( model, cmds ) =
+    let
         maybeDiscussionId =
             if model.config.discussionId == Nothing then
                 case model.route of
@@ -140,39 +105,61 @@ doInitApplication model =
             else
                 model.config.discussionId
 
-        ( phxSocket', phxCmd' ) =
+        ( phxSocket, phxCmd ) =
             case maybeDiscussionId of
                 Just discussionId ->
-                    Backend.doJoinDiscussionChannel discussionId model.config phxSocket
+                    Backend.joinDiscussionChannel discussionId model.config model.socket
 
                 Nothing ->
-                    ( phxSocket, Cmd.none )
+                    ( model.socket, Cmd.none )
+
+        maybeRedirect =
+            case model.config.discussionId of
+                Just discussionId ->
+                    Navigation.modifyUrl <| "#discussions/" ++ (toString discussionId)
+
+                Nothing ->
+                    Cmd.none
     in
-        ( { model
-            | socket = phxSocket'
-            , discussionId = maybeDiscussionId
-          }
+        ( { model | socket = phxSocket }
         , Cmd.batch
-            [ Cmd.map PhoenixMsg phxCmd
-            , Cmd.map PhoenixMsg phxCmd'
+            [ cmds
+            , Cmd.map PhoenixMsg phxCmd
             , maybeRedirect
             ]
         )
 
 
-doRequestDiscussionCreation : Discussion -> Model -> ( Model, Cmd Msg )
-doRequestDiscussionCreation discussion model =
+sendMessage : Model -> ( Model, Cmd Msg )
+sendMessage model =
+    let
+        discussionId =
+            Maybe.withDefault 0 model.discussionId
+
+        ( phxSocket, phxCmd ) =
+            Backend.sendMessage model.currentMessage discussionId model.socket
+    in
+        ( { model
+            | socket = phxSocket
+            , currentMessage = ""
+          }
+        , Cmd.map PhoenixMsg phxCmd
+        )
+
+
+requestDiscussionCreation : Discussion -> Model -> ( Model, Cmd Msg )
+requestDiscussionCreation discussion model =
     let
         ( pxhSocket, phxCmd ) =
-            Backend.doCreateDiscussion discussion.subject model.socket
+            Backend.createDiscussion discussion.subject model.socket
     in
         ( { model | socket = pxhSocket }
         , Cmd.map PhoenixMsg phxCmd
         )
 
 
-doShowDiscussionList : Model -> ( Model, Cmd Msg )
-doShowDiscussionList model =
+showDiscussionList : Model -> ( Model, Cmd Msg )
+showDiscussionList model =
     let
         modifyUrlCmd =
             Navigation.modifyUrl "#discussions"
@@ -197,11 +184,11 @@ doShowDiscussionList model =
                 model ! [ modifyUrlCmd ]
 
 
-doShowDiscussion : DiscussionId -> Model -> ( Model, Cmd Msg )
-doShowDiscussion discussionId model =
+showDiscussion : DiscussionId -> Model -> ( Model, Cmd Msg )
+showDiscussion discussionId model =
     let
         ( phxSocket, phxCmd ) =
-            Backend.doJoinDiscussionChannel discussionId model.config model.socket
+            Backend.joinDiscussionChannel discussionId model.config model.socket
     in
         ( { model
             | socket = phxSocket
@@ -212,3 +199,34 @@ doShowDiscussion discussionId model =
             , Cmd.map PhoenixMsg phxCmd
             ]
         )
+
+
+createDiscussion : String -> Model -> ( Model, Cmd Msg )
+createDiscussion subject model =
+    let
+        cleanSubject =
+            subject
+                |> String.trim
+                |> String.toLower
+                |> String.Extra.humanize
+
+        newDiscussion =
+            { id = 0
+            , subject = subject
+            , participants = []
+            , last_activity = "loading..."
+            }
+
+        ( newModel, commands ) =
+            requestDiscussionCreation newDiscussion model
+    in
+        if String.isEmpty cleanSubject then
+            model ! []
+        else
+            ( { newModel
+                | discussions = newDiscussion :: model.discussions
+                , discussionSubject = ""
+                , editingDiscussion = False
+              }
+            , commands
+            )

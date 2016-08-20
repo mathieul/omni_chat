@@ -4,11 +4,11 @@ module Online.Backend
         , discussionChannel
         , initSocket
         , leaveDiscussionChannel
-        , doHandlePhoenixMsg
-        , doCreateDiscussion
-        , doJoinDiscussionChannel
-        , doJoinDiscussionHallChannel
-        , doSendMessage
+        , handlePhoenixMsg
+        , createDiscussion
+        , joinDiscussionChannel
+        , joinDiscussionHallChannel
+        , sendMessage
         )
 
 import Json.Encode as JE
@@ -51,8 +51,8 @@ leaveDiscussionChannel discussionId socket =
         Phoenix.Socket.leave channelName unsubscribedSocket
 
 
-doHandlePhoenixMsg : Phoenix.Socket.Msg Msg -> Model -> ( Model, Cmd Msg )
-doHandlePhoenixMsg phxMsg model =
+handlePhoenixMsg : Phoenix.Socket.Msg Msg -> Model -> ( Model, Cmd Msg )
+handlePhoenixMsg phxMsg model =
     let
         ( phxSocket, phxCmd ) =
             Phoenix.Socket.update phxMsg model.socket
@@ -62,8 +62,8 @@ doHandlePhoenixMsg phxMsg model =
         )
 
 
-doCreateDiscussion : String -> Socket Msg -> ( Socket Msg, Cmd (Phoenix.Socket.Msg Msg) )
-doCreateDiscussion subject socket =
+createDiscussion : String -> Socket Msg -> ( Socket Msg, Cmd (Phoenix.Socket.Msg Msg) )
+createDiscussion subject socket =
     let
         payload =
             JE.object
@@ -76,8 +76,8 @@ doCreateDiscussion subject socket =
         Phoenix.Socket.push phxPush socket
 
 
-doJoinDiscussionChannel : DiscussionId -> AppConfig -> Socket Msg -> ( Socket Msg, Cmd (Phoenix.Socket.Msg Msg) )
-doJoinDiscussionChannel discussionId config socket =
+joinDiscussionChannel : DiscussionId -> AppConfig -> Socket Msg -> ( Socket Msg, Cmd (Phoenix.Socket.Msg Msg) )
+joinDiscussionChannel discussionId config socket =
     let
         channelName =
             discussionChannel discussionId
@@ -94,8 +94,8 @@ doJoinDiscussionChannel discussionId config socket =
         Phoenix.Socket.join channel subscribedSocket
 
 
-doJoinDiscussionHallChannel : AppConfig -> Socket Msg -> ( Socket Msg, Cmd (Phoenix.Socket.Msg Msg) )
-doJoinDiscussionHallChannel config socket =
+joinDiscussionHallChannel : AppConfig -> Socket Msg -> ( Socket Msg, Cmd (Phoenix.Socket.Msg Msg) )
+joinDiscussionHallChannel config socket =
     let
         channel =
             Phoenix.Channel.init hallChannel
@@ -114,8 +114,8 @@ userParams config =
         ]
 
 
-doSendMessage : String -> DiscussionId -> Socket Msg -> ( Socket Msg, Cmd (Phoenix.Socket.Msg Msg) )
-doSendMessage content discussionId socket =
+sendMessage : String -> DiscussionId -> Socket Msg -> ( Socket Msg, Cmd (Phoenix.Socket.Msg Msg) )
+sendMessage content discussionId socket =
     let
         channelName =
             discussionChannel discussionId
