@@ -40,15 +40,17 @@ update msg model =
             { model | connected = False } ! []
 
         ReceiveAllDiscussions raw ->
-            Discussion.receiveAll raw model
+            ( Discussion.decodeCollection raw model
+            , Cmd.none
+            )
 
         ReceiveMessageList raw ->
-            ( DiscussionMessage.receiveCollection raw model
+            ( DiscussionMessage.decodeCollection raw model
             , Task.perform (always NoOp) (always NoOp) (toBottom "main")
             )
 
         ReceiveMessage raw ->
-            ( DiscussionMessage.receiveOne raw model
+            ( DiscussionMessage.decodeOne raw model
             , Task.perform (always NoOp) (always NoOp) (toBottom "main")
             )
 

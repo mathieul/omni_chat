@@ -1,46 +1,34 @@
-module Online.Discussion exposing (receiveAll)
+module Online.Discussion exposing (decodeCollection)
 
 import Json.Decode as JD exposing ((:=))
 import Json.Encode as JE
+import JsonApi
+import JsonApi.Documents
+import JsonApi.Decode
+import JsonApi.Resources
 import Online.Types exposing (Model, Msg, Discussion, Chatter)
 
 
-type alias JsonApiContainer =
-    { data : List AllDiscussionsWrapper }
+decodeCollection : JE.Value -> Model -> Model
+decodeCollection raw model =
+    let
+        discussions =
+            JD.decodeValue JsonApi.Decode.document raw
+                |> (flip Result.andThen) JsonApi.Documents.primaryResourceCollection
+                |> Result.map (List.map extractDiscussionFromResource)
+                |> Result.withDefault []
+    in
+        { model | discussions = discussions }
 
 
-type alias AllDiscussionsWrapper =
-    { attributes : Discussion }
-
-
-receiveAll : JE.Value -> Model -> ( Model, Cmd Msg )
-receiveAll raw model =
-    case JD.decodeValue collectionDecoder raw of
-        Ok content ->
-            let
-                discussions =
-                    List.map (\item -> item.attributes) content.data
-            in
-                { model | discussions = discussions } ! []
+extractDiscussionFromResource : JsonApi.Resource -> Discussion
+extractDiscussionFromResource discussionResource =
+    case JsonApi.Resources.attributes discussionDecoder discussionResource of
+        Ok discussion ->
+            discussion
 
         Err error ->
-            let
-                _ =
-                    Debug.log "Discussion Error: " error
-            in
-                model ! []
-
-
-collectionDecoder : JD.Decoder JsonApiContainer
-collectionDecoder =
-    JD.object1 JsonApiContainer
-        ("data" := JD.list attributesDecoder)
-
-
-attributesDecoder : JD.Decoder AllDiscussionsWrapper
-attributesDecoder =
-    JD.object1 AllDiscussionsWrapper
-        ("attributes" := discussionDecoder)
+            Debug.crash error
 
 
 discussionDecoder : JD.Decoder Discussion
@@ -48,12 +36,12 @@ discussionDecoder =
     JD.object4 Discussion
         ("id" := JD.int)
         ("subject" := JD.string)
-        ("participants" := JD.list participantDecoder)
+        ("participants" := JD.list chatterDecoder)
         ("last-activity" := JD.string)
 
 
-participantDecoder : JD.Decoder Chatter
-participantDecoder =
+chatterDecoder : JD.Decoder Chatter
+chatterDecoder =
     JD.object2 Chatter
         ("id" := JD.int)
         ("nickname" := JD.string)
