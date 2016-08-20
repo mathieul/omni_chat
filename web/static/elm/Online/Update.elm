@@ -39,12 +39,12 @@ update msg model =
 
         ReceiveMessageList raw ->
             ( JsonApiDecoders.decodeDiscussionMessageCollection raw model
-            , Task.perform (always NoOp) (always NoOp) (toBottom "main")
+            , scrollToBottomOfBody
             )
 
         ReceiveMessage raw ->
             ( JsonApiDecoders.decodeDiscussionMessage raw model
-            , Task.perform (always NoOp) (always NoOp) (toBottom "main")
+            , scrollToBottomOfBody
             )
 
         UpdateCurrentMessage content ->
@@ -54,10 +54,10 @@ update msg model =
             sendMessage model
 
         HandlePresenceState raw ->
-            (Presence.processPresenceState raw model) ! []
+            Presence.processPresenceState raw model ! []
 
         HandlePresenceDiff raw ->
-            (Presence.processPresenceDiff raw model) ! []
+            Presence.processPresenceDiff raw model ! []
 
         ShowDiscussionList ->
             showDiscussionList model
@@ -67,7 +67,7 @@ update msg model =
 
         StartEditingDiscussion ->
             ( { model | editingDiscussion = True }
-            , Task.perform (always NoOp) (always NoOp) (Dom.focus "discussion-subject")
+            , focusOnElement "discussion-subject"
             )
 
         StopEditingDiscussion ->
@@ -147,17 +147,6 @@ sendMessage model =
         )
 
 
-requestDiscussionCreation : Discussion -> Model -> ( Model, Cmd Msg )
-requestDiscussionCreation discussion model =
-    let
-        ( pxhSocket, phxCmd ) =
-            Backend.createDiscussion discussion.subject model.socket
-    in
-        ( { model | socket = pxhSocket }
-        , Cmd.map PhoenixMsg phxCmd
-        )
-
-
 showDiscussionList : Model -> ( Model, Cmd Msg )
 showDiscussionList model =
     let
@@ -217,16 +206,27 @@ createDiscussion subject model =
             , last_activity = "loading..."
             }
 
-        ( newModel, commands ) =
-            requestDiscussionCreation newDiscussion model
+        ( phxSocket, phxCmd ) =
+            Backend.createDiscussion cleanSubject model.socket
     in
         if String.isEmpty cleanSubject then
             model ! []
         else
-            ( { newModel
-                | discussions = newDiscussion :: model.discussions
+            ( { model
+                | socket = phxSocket
+                , discussions = newDiscussion :: model.discussions
                 , discussionSubject = ""
                 , editingDiscussion = False
               }
-            , commands
+            , Cmd.map PhoenixMsg phxCmd
             )
+
+
+scrollToBottomOfBody : Cmd Msg
+scrollToBottomOfBody =
+    Task.perform (always NoOp) (always NoOp) (toBottom "main")
+
+
+focusOnElement : String -> Cmd Msg
+focusOnElement id =
+    Task.perform (always NoOp) (always NoOp) (Dom.focus id)
