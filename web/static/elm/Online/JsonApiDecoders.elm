@@ -1,4 +1,9 @@
-module Online.DiscussionMessage exposing (decodeCollection, decodeOne)
+module Online.JsonApiDecoders
+    exposing
+        ( decodeDiscussionCollection
+        , decodeDiscussionMessageCollection
+        , decodeDiscussionMessage
+        )
 
 import Json.Decode as JD exposing ((:=))
 import Json.Encode as JE
@@ -6,11 +11,23 @@ import JsonApi
 import JsonApi.Documents
 import JsonApi.Decode
 import JsonApi.Resources
-import Online.Types exposing (Model, DiscussionMessage, Chatter)
+import Online.Types exposing (Model, Discussion, DiscussionMessage, Chatter)
 
 
-decodeCollection : JE.Value -> Model -> Model
-decodeCollection raw model =
+decodeDiscussionCollection : JE.Value -> Model -> Model
+decodeDiscussionCollection raw model =
+    let
+        discussions =
+            JD.decodeValue JsonApi.Decode.document raw
+                |> (flip Result.andThen) JsonApi.Documents.primaryResourceCollection
+                |> Result.map (List.map extractDiscussionFromResource)
+                |> Result.withDefault []
+    in
+        { model | discussions = discussions }
+
+
+decodeDiscussionMessageCollection : JE.Value -> Model -> Model
+decodeDiscussionMessageCollection raw model =
     let
         messages =
             JD.decodeValue JsonApi.Decode.document raw
@@ -21,8 +38,8 @@ decodeCollection raw model =
         { model | messages = messages }
 
 
-decodeOne : JE.Value -> Model -> Model
-decodeOne raw model =
+decodeDiscussionMessage : JE.Value -> Model -> Model
+decodeDiscussionMessage raw model =
     let
         messages =
             model.messages
@@ -32,6 +49,16 @@ decodeOne raw model =
                 |> List.reverse
     in
         { model | messages = messages }
+
+
+extractDiscussionFromResource : JsonApi.Resource -> Discussion
+extractDiscussionFromResource discussionResource =
+    case JsonApi.Resources.attributes discussionDecoder discussionResource of
+        Ok discussion ->
+            discussion
+
+        Err error ->
+            Debug.crash error
 
 
 extractMessage : JE.Value -> DiscussionMessage
@@ -57,25 +84,29 @@ extractMessageFromResource messageResource =
             messageResource
                 |> JsonApi.Resources.attributes ("content" := JD.string)
                 |> Result.withDefault ""
-    in
-        { chatter = extractChatterAsRelatedResource messageResource
-        , content = content
-        }
 
-
-extractChatterAsRelatedResource : JsonApi.Resource -> Chatter
-extractChatterAsRelatedResource messageResource =
-    let
         chatterResult =
             JsonApi.Resources.relatedResource "chatter" messageResource
                 |> (flip Result.andThen) (JsonApi.Resources.attributes chatterDecoder)
-    in
-        case chatterResult of
-            Ok chatter ->
-                chatter
 
-            Err error ->
-                Debug.crash error
+        chatter =
+            case chatterResult of
+                Ok chatter ->
+                    chatter
+
+                Err error ->
+                    Debug.crash error
+    in
+        { chatter = chatter, content = content }
+
+
+discussionDecoder : JD.Decoder Discussion
+discussionDecoder =
+    JD.object4 Discussion
+        ("id" := JD.int)
+        ("subject" := JD.string)
+        ("participants" := JD.list chatterDecoder)
+        ("last-activity" := JD.string)
 
 
 chatterDecoder : JD.Decoder Chatter

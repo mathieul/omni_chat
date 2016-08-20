@@ -7,8 +7,7 @@ import OutMessage
 import Online.Types exposing (..)
 import Online.Backend as Backend
 import Online.Presence as Presence
-import Online.Discussion as Discussion
-import Online.DiscussionMessage as DiscussionMessage
+import Online.JsonApiDecoders as JsonApiDecoders
 import Components.DiscussionEditor as DiscussionEditor
 
 
@@ -40,17 +39,17 @@ update msg model =
             { model | connected = False } ! []
 
         ReceiveAllDiscussions raw ->
-            ( Discussion.decodeCollection raw model
+            ( JsonApiDecoders.decodeDiscussionCollection raw model
             , Cmd.none
             )
 
         ReceiveMessageList raw ->
-            ( DiscussionMessage.decodeCollection raw model
+            ( JsonApiDecoders.decodeDiscussionMessageCollection raw model
             , Task.perform (always NoOp) (always NoOp) (toBottom "main")
             )
 
         ReceiveMessage raw ->
-            ( DiscussionMessage.decodeOne raw model
+            ( JsonApiDecoders.decodeDiscussionMessage raw model
             , Task.perform (always NoOp) (always NoOp) (toBottom "main")
             )
 
