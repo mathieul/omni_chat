@@ -18,7 +18,6 @@
         "elm-lang/navigation": "1.0.0 <= v < 2.0.0",
         "evancz/url-parser": "1.0.0 <= v < 2.0.0",
         "fbonetti/elm-phoenix-socket": "2.0.0 <= v < 3.0.0",
-        "folkertdev/outmessage": "1.0.2 <= v < 2.0.0",
         "noahzgordon/elm-jsonapi": "2.0.1 <= v < 3.0.0"
     },
     "elm-version": "0.17.1 <= v < 0.18.0"

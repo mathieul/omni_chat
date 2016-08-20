@@ -4,7 +4,6 @@ import Dict exposing (Dict)
 import Phoenix.Socket
 import Json.Encode exposing (Value)
 import Dom
-import Components.DiscussionEditor as DiscussionEditor
 
 
 -- Model
@@ -19,8 +18,9 @@ type alias Model =
     , messages : List DiscussionMessage
     , config : AppConfig
     , route : Route
-    , discussionEditorModel : DiscussionEditor.Model
     , currentMessage : String
+    , editingDiscussion : Bool
+    , discussionSubject : String
     }
 
 
@@ -60,9 +60,12 @@ type Msg
     | ReceiveMessage Value
     | UpdateCurrentMessage String
     | SendMessage
-    | DiscussionEditorMsg DiscussionEditor.Msg
     | ShowDiscussionList
     | ShowDiscussion DiscussionId
+    | StartEditingDiscussion
+    | StopEditingDiscussion
+    | UpdateDiscussionSubject String
+    | CreateDiscussion String
 
 
 

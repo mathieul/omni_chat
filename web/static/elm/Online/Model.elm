@@ -5,7 +5,6 @@ import Dict exposing (Dict)
 import Online.Types exposing (Model, Msg, Route, AppConfig)
 import Online.Routing as Routing
 import Online.Backend as Backend
-import Components.DiscussionEditor as DiscussionEditor
 
 
 type alias ConfigFromJs =
@@ -46,6 +45,7 @@ initialModel rawConfig route =
     , messages = []
     , config = initialAppConfig rawConfig
     , route = route
-    , discussionEditorModel = DiscussionEditor.initialModel
     , currentMessage = ""
+    , editingDiscussion = False
+    , discussionSubject = ""
     }

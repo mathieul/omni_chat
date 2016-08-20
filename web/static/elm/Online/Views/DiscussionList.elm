@@ -6,15 +6,14 @@ import Html.Attributes exposing (class, classList, type')
 import Html.Events exposing (onClick)
 import Online.Types exposing (..)
 import Online.Views.TopBar as TopBarView
-import Components.DiscussionEditor as DiscussionEditor
+import Online.Views.DiscussionEditor as DiscussionEditor
 
 
 view : Model -> Html Msg
 view model =
     let
         discussionEditorView =
-            DiscussionEditor.view model.discussionEditorModel
-                |> App.map DiscussionEditorMsg
+            DiscussionEditor.view model
 
         discussionsView =
             List.map discussionCardView model.discussions

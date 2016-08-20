@@ -1,14 +1,15 @@
 module Online.Update exposing (update)
 
+import String
+import String.Extra
 import Navigation
 import Task
+import Dom exposing (focus)
 import Dom.Scroll exposing (toBottom)
-import OutMessage
 import Online.Types exposing (..)
 import Online.Backend as Backend
 import Online.Presence as Presence
 import Online.JsonApiDecoders as JsonApiDecoders
-import Components.DiscussionEditor as DiscussionEditor
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -22,15 +23,6 @@ update msg model =
 
         PhoenixMsg phxMsg ->
             Backend.doHandlePhoenixMsg phxMsg model
-
-        DiscussionEditorMsg deMsg ->
-            DiscussionEditor.update deMsg model.discussionEditorModel
-                |> OutMessage.mapComponent
-                    (\discussionEditorModel ->
-                        { model | discussionEditorModel = discussionEditorModel }
-                    )
-                |> OutMessage.mapCmd DiscussionEditorMsg
-                |> OutMessage.evaluateMaybe interpretOutMsg Cmd.none
 
         DidJoinChannel ->
             { model | connected = True } ! []
@@ -82,6 +74,46 @@ update msg model =
         ShowDiscussion discussionId ->
             doShowDiscussion discussionId model
 
+        StartEditingDiscussion ->
+            ( { model | editingDiscussion = True }
+            , Task.perform (always NoOp) (always NoOp) (Dom.focus "discussion-subject")
+            )
+
+        StopEditingDiscussion ->
+            { model | editingDiscussion = False } ! []
+
+        UpdateDiscussionSubject subject ->
+            { model | discussionSubject = subject } ! []
+
+        CreateDiscussion subject ->
+            let
+                cleanSubject =
+                    subject
+                        |> String.trim
+                        |> String.toLower
+                        |> String.Extra.humanize
+
+                newDiscussion =
+                    { id = 0
+                    , subject = subject
+                    , participants = []
+                    , last_activity = "loading..."
+                    }
+
+                ( newModel, commands ) =
+                    doRequestDiscussionCreation newDiscussion model
+            in
+                if String.isEmpty cleanSubject then
+                    model ! []
+                else
+                    ( { newModel
+                        | discussions = newDiscussion :: model.discussions
+                        , discussionSubject = ""
+                        , editingDiscussion = False
+                      }
+                    , commands
+                    )
+
 
 doInitApplication : Model -> ( Model, Cmd Msg )
 doInitApplication model =
@@ -126,28 +158,6 @@ doInitApplication model =
             , maybeRedirect
             ]
         )
-
-
-interpretOutMsg : DiscussionEditor.OutMsg -> Model -> ( Model, Cmd Msg )
-interpretOutMsg outmsg model =
-    case outmsg of
-        DiscussionEditor.DiscussionCreationRequested subject ->
-            let
-                newDiscussion =
-                    { id = 0
-                    , subject = subject
-                    , participants = []
-                    , last_activity = "loading..."
-                    }
-
-                ( newModel, commands ) =
-                    doRequestDiscussionCreation newDiscussion model
-            in
-                ( { newModel
-                    | discussions = newDiscussion :: model.discussions
-                  }
-                , commands
-                )
 
 
 doRequestDiscussionCreation : Discussion -> Model -> ( Model, Cmd Msg )
