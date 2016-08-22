@@ -1,6 +1,7 @@
 module Online.Types exposing (..)
 
 import Dict exposing (Dict)
+import Date exposing (Date)
 import Phoenix.Socket
 import Json.Encode exposing (Value)
 import Dom
@@ -116,4 +117,5 @@ type alias Chatter =
 type alias DiscussionMessage =
     { chatter : Chatter
     , content : String
+    , insertedAt : Date
     }

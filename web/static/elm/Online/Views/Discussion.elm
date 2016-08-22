@@ -1,7 +1,9 @@
 module Online.Views.Discussion exposing (view)
 
+import Date exposing (Date)
+import Date.Format as DF
 import Html exposing (Html, div, text, form, input, button, strong)
-import Html.Attributes exposing (class, type', style, id, value, autofocus)
+import Html.Attributes exposing (class, type', style, id, value, autofocus, title)
 import Html.Events exposing (onSubmit, onInput)
 import Online.Types exposing (..)
 import Online.Views.TopBar as TopBarView
@@ -27,27 +29,37 @@ messageListView model =
 
 messageView : ChatterId -> DiscussionMessage -> Html Msg
 messageView chatterId message =
-    if message.chatter.id == chatterId then
-        myMessage message.content
-    else
-        theirMessage message.chatter.nickname message.content
+    let
+        messageDate =
+            DF.format "%m/%d/%Y %I:%M%P" message.insertedAt
+    in
+        if message.chatter.id == chatterId then
+            myMessage message.content messageDate
+        else
+            theirMessage message.chatter.nickname message.content messageDate
 
 
-myMessage : String -> Html Msg
-myMessage content =
+myMessage : String -> String -> Html Msg
+myMessage content messageDate =
     div [ class "row" ]
         [ div [ class "col-xs-10 col-xs-offset-2" ]
-            [ div [ class "message mine pull-xs-right" ]
+            [ div
+                [ class "message mine pull-xs-right"
+                , title messageDate
+                ]
                 [ text content ]
             ]
         ]
 
 
-theirMessage : String -> String -> Html Msg
-theirMessage nickname content =
+theirMessage : String -> String -> String -> Html Msg
+theirMessage nickname content messageDate =
     div [ class "row" ]
         [ div [ class "col-xs-10" ]
-            [ div [ class "message theirs pull-xs-left" ]
+            [ div
+                [ class "message theirs pull-xs-left"
+                , title messageDate
+                ]
                 [ strong [ style [ ( "margin-right", ".5rem" ) ] ] [ text nickname ]
                 , text content
                 ]

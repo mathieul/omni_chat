@@ -5,7 +5,9 @@ module Online.JsonApiDecoders
         , decodeDiscussionMessage
         )
 
+import Date
 import Json.Decode as JD exposing ((:=))
+import Json.Decode.Extra as JDE
 import Json.Encode as JE
 import JsonApi
 import JsonApi.Documents
@@ -85,6 +87,14 @@ extractMessageFromResource messageResource =
                 |> JsonApi.Resources.attributes ("content" := JD.string)
                 |> Result.withDefault ""
 
+        insertedAt =
+            messageResource
+                |> JsonApi.Resources.attributes ("inserted-at" := JDE.date)
+                |> Result.withDefault (Date.fromTime 0)
+
+        _ =
+            Debug.log "insertedAt" insertedAt
+
         chatterResult =
             JsonApi.Resources.relatedResource "chatter" messageResource
                 |> (flip Result.andThen) (JsonApi.Resources.attributes chatterDecoder)
@@ -97,7 +107,7 @@ extractMessageFromResource messageResource =
                 Err error ->
                     Debug.crash error
     in
-        { chatter = chatter, content = content }
+        DiscussionMessage chatter content insertedAt
 
 
 discussionDecoder : JD.Decoder Discussion
