@@ -23,10 +23,13 @@ Run tests:
     $ elm-test Main.elm
 
 
-## Learn more
+## Release
 
-  * Official website: http://www.phoenixframework.org/
-  * Guides: http://phoenixframework.org/docs/overview
-  * Docs: https://hexdocs.pm/phoenix
-  * Mailing list: http://groups.google.com/group/phoenix-talk
-  * Source: https://github.com/phoenixframework/phoenix
+Bump application version in `mix.exs` (i.e.: 0.3.3) and run as user `elixir`:
+
+    $ cd dev/omni_chat
+    $ git pull
+    $ brunch build && mix do phoenix.digest, compile, release
+    $ cp -r rel/omni_chat/releases/0.3.3/ /app/releases/
+    $ cd /app
+    $ ./bin/omni_chat upgrade 0.3.3
