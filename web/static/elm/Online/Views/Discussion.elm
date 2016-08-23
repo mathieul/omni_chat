@@ -2,7 +2,7 @@ module Online.Views.Discussion exposing (view)
 
 import Date exposing (Date)
 import Date.Format as DF
-import Html exposing (Html, div, text, form, input, button, strong)
+import Html exposing (Html, div, text, form, input, button, strong, br)
 import Html.Attributes exposing (class, type', style, id, value, autofocus, title)
 import Html.Events exposing (onSubmit, onInput)
 import Online.Types exposing (..)
@@ -47,7 +47,10 @@ myMessage content messageDate =
                 [ class "message mine pull-xs-right"
                 , title messageDate
                 ]
-                [ text content ]
+                [ text content
+                  -- , br [] []
+                  -- , div [ class "tag tag-pill tag-success" ] [ text messageDate ]
+                ]
             ]
         ]
 
@@ -62,6 +65,8 @@ theirMessage nickname content messageDate =
                 ]
                 [ strong [ style [ ( "margin-right", ".5rem" ) ] ] [ text nickname ]
                 , text content
+                  -- , br [] []
+                  -- , div [ class "tag tag-pill tag-default" ] [ text messageDate ]
                 ]
             ]
         ]
