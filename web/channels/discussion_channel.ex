@@ -99,10 +99,10 @@ defmodule OmniChat.DiscussionChannel do
     })
   end
 
-  defp send_all_discussions(socket, broadcast: broadcast) do
+  defp send_all_discussions(socket, broadcast: should_broadcast) do
     discussions = Discussion.fetch_all_with_participants
     collection_payload = JaSerializer.format(OmniChat.DiscussionSerializer, discussions)
-    if broadcast do
+    if should_broadcast do
       broadcast socket, "all_discussions", collection_payload
     else
       push socket, "all_discussions", collection_payload
