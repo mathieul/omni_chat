@@ -49,7 +49,8 @@ exports.config = {
     },
     elmBrunch: {
       mainModules: ['web/static/elm/Online.elm'],
-      outputFolder: 'web/static/vendor'
+      outputFolder: 'web/static/vendor',
+      makeParameters: ['--debug']
     },
     sass: {
       options: {

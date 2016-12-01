@@ -1,7 +1,7 @@
 module Online.Presence exposing (processPresenceState, processPresenceDiff)
 
 import Dict
-import Json.Decode as JD exposing ((:=))
+import Json.Decode as JD exposing (field)
 import Json.Encode as JE
 import Online.Types
     exposing
@@ -60,9 +60,9 @@ processPresenceDiff raw model =
 
 presenceDiffDecoder : JD.Decoder PresenceDiff
 presenceDiffDecoder =
-    JD.object2 PresenceDiff
-        ("leaves" := presenceStateDecoder)
-        ("joins" := presenceStateDecoder)
+    JD.map2 PresenceDiff
+        (field "leaves" presenceStateDecoder)
+        (field "joins" presenceStateDecoder)
 
 
 presenceStateDecoder : JD.Decoder PresenceState
@@ -72,13 +72,13 @@ presenceStateDecoder =
 
 presenceStateMetaWrapperDecoder : JD.Decoder PresenceStateMetaWrapper
 presenceStateMetaWrapperDecoder =
-    JD.object1 PresenceStateMetaWrapper
-        ("metas" := JD.list presenceStateMetaDecoder)
+    JD.map PresenceStateMetaWrapper
+        (field "metas" (JD.list presenceStateMetaDecoder))
 
 
 presenceStateMetaDecoder : JD.Decoder PresenceStateMetaValue
 presenceStateMetaDecoder =
-    JD.object3 PresenceStateMetaValue
-        ("phx_ref" := JD.string)
-        ("online_at" := JD.string)
-        ("nickname" := JD.string)
+    JD.map3 PresenceStateMetaValue
+        (field "phx_ref" JD.string)
+        (field "online_at" JD.string)
+        (field "nickname" JD.string)

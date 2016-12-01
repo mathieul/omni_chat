@@ -2,6 +2,7 @@ module Online.Model exposing (ConfigFromJs, init)
 
 import String
 import Dict exposing (Dict)
+import Navigation exposing (Location)
 import Online.Types exposing (Model, Msg, Route, AppConfig)
 import Online.Routing as Routing
 import Online.Backend as Backend
@@ -16,11 +17,11 @@ type alias ConfigFromJs =
     }
 
 
-init : ConfigFromJs -> Result String Route -> ( Model, Cmd Msg )
+init : ConfigFromJs -> Location -> ( Model, Cmd Msg )
 init rawConfig result =
     let
         currentRoute =
-            Routing.routeFromResult result
+            Routing.parseLocation result
     in
         ( initialModel rawConfig currentRoute, Cmd.none )
 

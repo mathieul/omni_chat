@@ -1,37 +1,24 @@
-module Online.Routing exposing (..)
+module Online.Routing exposing (matchers, parseLocation)
 
-import String
-import Navigation
-import UrlParser exposing ((</>))
+import Navigation exposing (Location)
+import UrlParser exposing (Parser, (</>), oneOf, s, int)
 import Online.Types exposing (DiscussionId, Route(..))
 
 
-matchers : UrlParser.Parser (Route -> a) a
+matchers : Parser (Route -> a) a
 matchers =
-    UrlParser.oneOf
-        [ UrlParser.format DiscussionListRoute (UrlParser.s "")
-        , UrlParser.format DiscussionRoute (UrlParser.s "discussions" </> UrlParser.int)
-        , UrlParser.format DiscussionListRoute (UrlParser.s "discussions")
+    oneOf
+        [ UrlParser.map DiscussionListRoute (s "")
+        , UrlParser.map DiscussionRoute (s "discussions" </> int)
+        , UrlParser.map DiscussionListRoute (s "discussions")
         ]
 
 
-hashParser : Navigation.Location -> Result String Route
-hashParser location =
-    location.hash
-        |> String.dropLeft 1
-        |> UrlParser.parse identity matchers
-
-
-parser : Navigation.Parser (Result String Route)
-parser =
-    Navigation.makeParser hashParser
-
-
-routeFromResult : Result String Route -> Route
-routeFromResult result =
-    case result of
-        Ok route ->
+parseLocation : Location -> Route
+parseLocation location =
+    case (UrlParser.parseHash matchers location) of
+        Just route ->
             route
 
-        Err string ->
+        Nothing ->
             NotFoundRoute

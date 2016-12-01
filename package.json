@@ -11,8 +11,8 @@
   },
   "devDependencies": {
     "babel-brunch": "~6.0.0",
-    "bootstrap": "4.0.0-alpha.3",
-    "brunch": "2.8.2",
+    "bootstrap": "4.0.0-alpha.5",
+    "brunch": "2.9.1",
     "clean-css-brunch": "~2.0.0",
     "css-brunch": "~2.6.1",
     "elm-brunch": "^0.7.0",

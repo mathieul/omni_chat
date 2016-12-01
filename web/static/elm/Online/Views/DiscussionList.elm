@@ -1,8 +1,7 @@
 module Online.Views.DiscussionList exposing (view)
 
-import Html.App as App
 import Html exposing (Html, div, header, text, h4, p, dl, dt, dd, ul, li, button, i)
-import Html.Attributes exposing (class, classList, type')
+import Html.Attributes exposing (class, classList, type_)
 import Html.Events exposing (onClick)
 import Online.Types exposing (..)
 import Online.Views.TopBar as TopBarView
@@ -47,7 +46,7 @@ discussionCardView discussion =
                         [ ul [] (List.map participantLine discussion.participants) ]
                     , div [ class "col-xs-7" ]
                         [ button
-                            [ type' "button"
+                            [ type_ "button"
                             , class "btn btn-success btn-block"
                             , onClick (ShowDiscussion discussion.id)
                             ]

@@ -1,7 +1,7 @@
 module Online.Views.DiscussionEditor exposing (view)
 
 import Html exposing (Html, text, div, a, i, h4, button, form, input)
-import Html.Attributes exposing (class, id, href, type', placeholder, autofocus, required, style)
+import Html.Attributes exposing (class, id, href, type_, placeholder, autofocus, required, style)
 import Html.Events exposing (onClick, onInput, onSubmit)
 import Online.Types exposing (Model, Msg(..))
 
@@ -30,7 +30,7 @@ choiceView =
                     ]
                 , div [ class "col-xs-4" ]
                     [ button
-                        [ type' "button"
+                        [ type_ "button"
                         , class "btn btn-lg btn-primary m-y-1"
                         , onClick StartEditingDiscussion
                         ]
@@ -48,7 +48,7 @@ formView model =
             [ form [ onSubmit <| CreateDiscussion model.discussionSubject ]
                 [ div [ class "form-group" ]
                     [ input
-                        [ type' "text"
+                        [ type_ "text"
                         , id "discussion-subject"
                         , class "form-control card-title"
                         , placeholder "Enter subject..."
@@ -60,14 +60,14 @@ formView model =
                 , div [ class "row" ]
                     [ div [ class "col-xs-6" ]
                         [ button
-                            [ type' "submit"
+                            [ type_ "submit"
                             , class "btn btn-lg btn-primary btn-block col-xs-5"
                             ]
                             [ text "Create" ]
                         ]
                     , div [ class "col-xs-6" ]
                         [ button
-                            [ type' "button"
+                            [ type_ "button"
                             , class "btn btn-lg btn-secondary btn-block col-xs-5 offset-xs-1"
                             , onClick StopEditingDiscussion
                             ]

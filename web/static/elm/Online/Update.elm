@@ -18,6 +18,9 @@ update msg model =
         NoOp ->
             model ! []
 
+        UrlChange location ->
+            model ! []
+
         InitApplication ->
             ( model, Cmd.none )
                 |> joinDiscussionHallChannel
@@ -224,9 +227,9 @@ createDiscussion subject model =
 
 scrollToBottomOfBody : Cmd Msg
 scrollToBottomOfBody =
-    Task.perform (always NoOp) (always NoOp) (toBottom "main")
+    Task.attempt (\_ -> NoOp) (toBottom "main")
 
 
 focusOnElement : String -> Cmd Msg
 focusOnElement id =
-    Task.perform (always NoOp) (always NoOp) (Dom.focus id)
+    Task.attempt (\_ -> NoOp) (Dom.focus id)

@@ -6,7 +6,7 @@ module Online.JsonApiDecoders
         )
 
 import Date
-import Json.Decode as JD exposing ((:=))
+import Json.Decode as JD exposing (field)
 import Json.Decode.Extra as JDE
 import Json.Encode as JE
 import JsonApi
@@ -21,7 +21,7 @@ decodeDiscussionCollection raw model =
     let
         discussions =
             JD.decodeValue JsonApi.Decode.document raw
-                |> (flip Result.andThen) JsonApi.Documents.primaryResourceCollection
+                |> Result.andThen JsonApi.Documents.primaryResourceCollection
                 |> Result.map (List.map extractDiscussionFromResource)
                 |> Result.withDefault []
     in
@@ -33,7 +33,7 @@ decodeDiscussionMessageCollection raw model =
     let
         messages =
             JD.decodeValue JsonApi.Decode.document raw
-                |> (flip Result.andThen) JsonApi.Documents.primaryResourceCollection
+                |> Result.andThen JsonApi.Documents.primaryResourceCollection
                 |> Result.map (List.map extractMessageFromResource)
                 |> Result.withDefault []
     in
@@ -68,7 +68,7 @@ extractMessage raw =
     let
         messageResult =
             JD.decodeValue JsonApi.Decode.document raw
-                |> (flip Result.andThen) JsonApi.Documents.primaryResource
+                |> Result.andThen JsonApi.Documents.primaryResource
                 |> Result.map extractMessageFromResource
     in
         case messageResult of
@@ -84,20 +84,17 @@ extractMessageFromResource messageResource =
     let
         content =
             messageResource
-                |> JsonApi.Resources.attributes ("content" := JD.string)
+                |> JsonApi.Resources.attributes (field "content" JD.string)
                 |> Result.withDefault ""
 
         insertedAt =
             messageResource
-                |> JsonApi.Resources.attributes ("inserted-at" := JDE.date)
+                |> JsonApi.Resources.attributes (field "inserted-at" JDE.date)
                 |> Result.withDefault (Date.fromTime 0)
-
-        _ =
-            Debug.log "insertedAt" insertedAt
 
         chatterResult =
             JsonApi.Resources.relatedResource "chatter" messageResource
-                |> (flip Result.andThen) (JsonApi.Resources.attributes chatterDecoder)
+                |> Result.andThen (JsonApi.Resources.attributes chatterDecoder)
 
         chatter =
             case chatterResult of
@@ -112,15 +109,15 @@ extractMessageFromResource messageResource =
 
 discussionDecoder : JD.Decoder Discussion
 discussionDecoder =
-    JD.object4 Discussion
-        ("id" := JD.int)
-        ("subject" := JD.string)
-        ("participants" := JD.list chatterDecoder)
-        ("last-activity" := JD.string)
+    JD.map4 Discussion
+        (field "id" JD.int)
+        (field "subject" JD.string)
+        (field "participants" (JD.list chatterDecoder))
+        (field "last-activity" JD.string)
 
 
 chatterDecoder : JD.Decoder Chatter
 chatterDecoder =
-    JD.object2 Chatter
-        ("id" := JD.int)
-        ("nickname" := JD.string)
+    JD.map2 Chatter
+        (field "id" JD.int)
+        (field "nickname" JD.string)

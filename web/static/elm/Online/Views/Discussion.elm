@@ -3,7 +3,7 @@ module Online.Views.Discussion exposing (view)
 import Date exposing (Date)
 import Date.Format as DF
 import Html exposing (Html, div, text, form, input, button, strong, br)
-import Html.Attributes exposing (class, type', style, id, value, autofocus, title)
+import Html.Attributes exposing (class, type_, style, id, value, autofocus, title)
 import Html.Events exposing (onSubmit, onInput)
 import Online.Types exposing (..)
 import Online.Views.TopBar as TopBarView
@@ -79,7 +79,7 @@ editor model =
             [ div [ class "row" ]
                 [ div [ class "col-xs-8", style [ ( "padding-right", "0" ) ] ]
                     [ input
-                        [ type' "text"
+                        [ type_ "text"
                         , class "form-control"
                         , value model.currentMessage
                         , autofocus True

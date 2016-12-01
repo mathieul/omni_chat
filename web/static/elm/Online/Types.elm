@@ -4,7 +4,7 @@ import Dict exposing (Dict)
 import Date exposing (Date)
 import Phoenix.Socket
 import Json.Encode exposing (Value)
-import Dom
+import Navigation
 
 
 -- Model
@@ -50,6 +50,7 @@ type alias AppConfig =
 
 type Msg
     = NoOp
+    | UrlChange Navigation.Location
     | InitApplication
     | PhoenixMsg (Phoenix.Socket.Msg Msg)
     | HandlePresenceState Value
