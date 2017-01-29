@@ -12,14 +12,14 @@ defmodule OmniChat.DiscussionChannel do
   def channel_name(id), do: "discussion:#{id}"
 
   def join(@hall, payload, socket) do
-    send self, :after_hall_join
+    send self(), :after_hall_join
     socket = remember_subscriber_info(socket, payload, discussion_id: nil)
 
     {:ok, socket}
   end
 
   def join("discussion:" <> discussion_id, payload, socket) do
-    send self, {:after_single_join, discussion_id}
+    send self(), {:after_single_join, discussion_id}
     socket = remember_subscriber_info(socket, payload, discussion_id: discussion_id)
 
     {:ok, socket}

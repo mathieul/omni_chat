@@ -16,11 +16,15 @@ defimpl Phoenix.HTML.FormData, for: OmniChat.AuthenticationForm do
     %Phoenix.HTML.Form{}
   end
 
-  def input_type(_changeset, _field) do
+  def input_value(_data, _form, _field) do
+    :todo
+  end
+
+  def input_type(_data, _form, _field) do
     :text_input
   end
 
-  def input_validations(_changeset, _field) do
+  def input_validations(_data, _form, _field) do
     [required: false]
   end
 end

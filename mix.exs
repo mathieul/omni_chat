@@ -46,24 +46,24 @@ defmodule OmniChat.Mixfile do
   # Specifies your project dependencies.
   defp deps do
     [
-      {:apex, "~>0.5.1"},
+      {:apex, "~>1.0.0"},
       {:cowboy, "~> 1.0"},
       {:ex_machina, "~> 1.0", only: :test},
-      {:ex_twilio, "~> 0.2.0"},
-      {:ex_twiml, "~> 2.1.0"},
+      {:ex_twilio, "~> 0.3.0"},
+      {:ex_twiml, "~> 2.1.2"},
       {:exrm, "~> 1.0.8"},
-      {:faker, "~> 0.5"},
-      {:gettext, "~> 0.11"},
-      {:ja_serializer, "~> 0.10.1"},
-      {:phoenix_ecto, "~> 3.0"},
-      {:phoenix_html, "~> 2.6"},
+      {:faker, "~> 0.7"},
+      {:gettext, "~> 0.13"},
+      {:ja_serializer, "~> 0.11.2"},
+      {:phoenix_ecto, "~> 3.2"},
+      {:phoenix_html, "~> 2.9"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix, "~> 1.2.1"},
-      {:poison, "~> 2.0"},
+      {:poison, "~> 2.2"},
       {:postgrex, ">= 0.0.0"},
-      {:timex_ecto, "~> 3.0.3"},
-      {:timex, "~> 3.0.5"}
+      {:timex_ecto, "~> 3.1.1"},
+      {:timex, "~> 3.1.8"}
     ]
   end
 
